@@ -1,0 +1,189 @@
+[
+    {
+        "selector": "[data-alpaca-item-container-item-key=soli_fecharecepcion]",
+        "tooltip": "<div class='tooltip-msg'><h4>Fecha de la Solicitud.</h4> Fecha de la solicitud en formato Día/Mes/Año, usando dos dígitos para el día y mes, y cuatro para el año. Por ejemplo, si la fecha es el 5 Octubre de 2012, Escriba 05/10/2012. Esta información es obligatoria.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=dpto_solicitud_id]",
+        "tooltip": "<div class='tooltip-msg'><h4>Departamento</h4>Seleccione el departamento correspondiente al lugar de atención de la solicitud.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=mpio_solicitud_id]",
+        "tooltip": "<div class='tooltip-msg'><h4>Municipio</h4>Seleccione el Municipio correspondiente al lugar de atención de la solicitud. </div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=ver_id]",
+        "tooltip": "<div class='tooltip-msg'><h4>Vereda</h4>Seleccione el nombre de la Vereda.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=soli_recepcion]",
+        "tooltip": "<div class='tooltip-msg'><h4>Nombre del receptor</h4>Escriba los nombres y apellidos de quien diligencia el formulario de Inscripción al Programa de formalización de la Propiedad Rural.</div>"
+    },
+    
+    
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_pers_nombre1]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el primer nombre del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_pers_nombre2]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el segundo nombre del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_pers_apellido1]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el primer apellido del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_pers_apellido2]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el segundo apellido del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_tigen_id]",
+        "tooltip": "<div class='tooltip-msg'>Marque con una masculino ó femenino</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_tidocid_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el tipo de documento que presente el solicitante como documento de identificación. Esta información es obligatoria.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_pers_documentoid]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el número exacto del documento que presente el solicitante para identificarse. Esta información es obligatoria. NO use caracteres especiales como puntos (.) o comas (,)</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_lugarexpediciondoc_dpto]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el departamento de expedición del documento</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_lugarexpediciondoc_mpio]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el municipio de expedición del documento</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=solicit_tiestciv_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el estado civil del solicitante</div>"
+    },
+    
+    
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_pers_nombre1]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el primer nombre del cónyugue del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_pers_nombre2]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el segundo nombre del cónyugue del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_pers_apellido1]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el primer apellido del cónyugue del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_pers_apellido2]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el segundo apellido del cónyugue del solicitante, tal como aparece en el documento de identidad</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_tigen_id]",
+        "tooltip": "<div class='tooltip-msg'>Marque con una masculino ó femenino</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_tidocid_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el tipo de documento que presente el solicitante como documento de identificación. Esta información es obligatoria.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_pers_documentoid]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el número exacto del documento que presente el solicitante para identificarse. Esta información es obligatoria. NO use caracteres especiales como puntos (.) o comas (,)</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_lugarexpediciondoc_dpto]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el departamento de expedición del documento</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=cony_lugarexpediciondoc_mpio]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el municipio de expedición del documento</div>"
+    },
+    
+    
+    
+    {
+        "selector": "[data-alpaca-item-container-item-key=notificacion_dpto_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el departamento donde vive actualmente</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=notificacion_mpio_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el municipio donde vive actualmente</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=noti_corregimiento]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el corregimiento o Inspección correspondiente a la ubicación del predio.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=noti_vereda]",
+        "tooltip": "<div class='tooltip-msg'>Escriba la denominación de la Vereda y Sector donde reside el solicitante</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=noti_direccion]",
+        "tooltip": "<div class='tooltip-msg'>Escriba la dirección del predio o nombre como se conoce el lugar donde reside el solicitante.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=noti_celular]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el número del celular en el cual se puede contactar al solicitante.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=noti_telfijo]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el número del teléfono fijo donde se puede contactar al solicitante.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=noti_correo]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el correo electrónico del solicitante.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=contacto_nombre]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el nombre y apellido de una persona conocida por el solicitante, a la cual el programa pueda contactar para informarle el estado del proceso o ser requerido.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=contacto_celular]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el número del celular del contacto.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=contacto_telfijo]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el número del teléfono fijo del contacto.</div>"
+    },
+    
+    {
+        "selector": "[data-alpaca-item-container-item-key=predio_dpto_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el departamento donde está ubicado el predio</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=predio_mpio_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el municipio donde está ubicado el predio</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=predio_ver_id]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione la vereda donde está ubicado el predio</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=pre_ambito]",
+        "tooltip": "<div class='tooltip-msg'>Seleccione el ánmbito del predio</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=pre_nombre]",
+        "tooltip": "<div class='tooltip-msg'>Escriba el nombre del predio</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=pre_direccion]",
+        "tooltip": "<div class='tooltip-msg'>Escriba una breve descripción de cómo se llega y las señas que faciliten la ubicación del predio.</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=pre_area]",
+        "tooltip": "<div class='tooltip-msg'>Escriba la superficie estimada del predio solicitado en m&#178;.</div>"
+    },
+    
+    {
+        "selector": "[data-alpaca-item-container-item-key=pre_cedula_catastral]",
+        "tooltip": "<div class='tooltip-msg'>Escriba la cédula catastral o número predial, tenga en cuanta: Departamento(2) | Municipio(3) | Zona(2) | Sector(2) | Vereda(4) | Predio(4) | Mejora(3). TOTAL(20)</div>"
+    },
+    {
+        "selector": "[data-alpaca-item-container-item-key=pre_matricula]",
+        "tooltip": "<div class='tooltip-msg'>Escriba la matrícula inmobiliaria.</div>"
+    }
+]
+
+

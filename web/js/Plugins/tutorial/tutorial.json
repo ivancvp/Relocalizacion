@@ -1,0 +1,22 @@
+{
+    "tutoriales": {
+        ".FormularioAbreviado": [
+            {
+                "selector": ".FormularioAbreviado [data-alpaca-item-container-item-key=soli_fecharecepcion]",
+                "texto": "Hola mundo1"
+            },
+            {
+                "selector": ".FormularioAbreviado [data-alpaca-item-container-item-key=solicit_pers_nombre1]",
+                "texto": "Hola mundo2"
+            },
+            {
+                "selector": "#frm input[name=nombre3]",
+                "texto": "Hola mundo3"
+            },
+            {
+                "selector": "#frm input[name=nombre4]",
+                "texto": ""
+            }
+        ]
+    }
+}

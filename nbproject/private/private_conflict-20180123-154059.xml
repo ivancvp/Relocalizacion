@@ -1,0 +1,31 @@
+<<<<<<< HEAD
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/src/java/com/frmejia/backend/util/ConsultasDML.xml</file>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/web/js/gov.cvp.reas/novedades/GestionarProcesos.js</file>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/web/js/gov.cvp.reas/contrato/GestionarContratos.js</file>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/web/resoluciones.jsp</file>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/web/js/gov.cvp.reas/pdf/impresion_resolucion.js</file>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/web/js/gov.cvp.reas/suspensiones/SuspensionesRelocalizacion.js</file>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/src/java/com/frmejia/backend/util/Consultas.xml</file>
+            <file>file:/C:/Users/Fabian/ownCloud/Reloca/src/java/com/frmejia/backend/util/Conexiones.xml</file>
+        </group>
+    </open-files>
+</project-private>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/frmejia/Documents/relocalizacion/web/beneficiarios.jsp</file>
+            <file>file:/C:/Users/frmejia/Documents/relocalizacion/web/seguimiento_novedades.jsp</file>
+            <file>file:/C:/Users/frmejia/Documents/relocalizacion/web/js/gov.cvp.reas/novedades/GestionarProcesos.js</file>
+            <file>file:/C:/Users/frmejia/Documents/relocalizacion/web/js/gov.cvp.reas/novedades/MenuNovedades.js</file>
+        </group>
+    </open-files>
+</project-private>
+>>>>>>> 09838f65b84456307fb7975767ec48d70adbc3ec

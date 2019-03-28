@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Conexiones>
+    <Conexion id="localhost">
+
+        <url>jdbc:postgresql://sig-reas:5432/atencion_reloca</url>
+        <!--<url>jdbc:postgresql://localhost:5432/atencion_reloca</url>-->
+        <!--<url>jdbc:postgresql://atencion_reloca:5432/atencion_reloca</url>-->
+        <!--<url>jdbc:postgresql://192.168.0.4:5432/atencion_reloca</url>-->
+        <user>postgres</user>
+        <password>123456</password>
+    </Conexion>
+    <Conexion id="atencion_reloca">
+        <!--<url>jdbc:postgresql://atencion_reloca:5432/atencion_reloca</url>-->
+        <!--<url>jdbc:postgresql://localhost:5432/atencion_reloca</url>-->
+        <url>jdbc:postgresql://sig-reas:5432/atencion_reloca</url>
+        <user>postgres</user>
+        <password>123456</password>
+    </Conexion>       
+    <Conexion id="Rockefeller_Edicion">
+        <url>jdbc:postgresql://localhost:5432/formalizacion</url>
+        <user>postgres</user>
+        <password>123456</password>
+    </Conexion>
+    <Conexion id="Rockefeller_Consulta">
+        <url>jdbc:postgresql://localhost:5432/formalizacion</url>
+        <user>postgres</user>
+        <password>123456</password>
+    </Conexion>
+</Conexiones>

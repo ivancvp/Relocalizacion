@@ -1,0 +1,42 @@
+function loadTutorials() {
+//    $.getJSON("../js/Plugins/tutorial/tutorial.json", function(data) {
+//        $.each(data["tutoriales"], function(key, val) {
+//            if ($(key).length > 0) {
+//                loadTutorial(val);
+//                addBoton();
+//                $(".verTutorial").on("click", function() {
+//                    introJs().start();
+//                });
+//            }
+//        });
+//    });
+}
+function addBoton(){
+    $(".verTutorialBtn").append("<span id='verTutorial' class='verTutorial'><img src='../js/Plugins/tutorial/Apps-demo-icon.png' />Ver tutorial</span>");
+    
+}
+function loadTutorial(config) {
+    var i = 1;
+    $.each(config, function(key, val) {
+        var obj = $(val["selector"]);
+        if (obj !== undefined && obj.length > 0) {
+            obj.attr("data-step", i);
+            obj.attr("data-intro", val["texto"]);
+            obj.attr("title", val["tooltip"]);
+            var tmp = val["tooltip"] + "";
+            var tooltip = tmp.replace("[tutorial]", "<span class='verTutorial'>Ver turorial</span>");
+            obj.tooltipster({
+                content: $('<div>' + val["tooltip"] + '</div>'),
+                theme: 'tooltipster-light'
+            });
+            i++;
+        }
+    });
+}
+
+$(function() {
+    loadTutorials();
+});
+
+
+

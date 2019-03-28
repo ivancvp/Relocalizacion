@@ -1,0 +1,1103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Consultas>
+    
+    
+    <Consulta id="ActualizarRevisionResoluciones">
+        <sql>
+            UPDATE resoluciones_marzo SET
+                
+            "INICIO" = CASE WHEN to_date('@INICIO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INICIO', 'DD/MM/YYYY') END,
+            "FIN" = CASE WHEN to_date('@FIN', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FIN', 'DD/MM/YYYY') END,
+            "CEDULA EVACUADO" = @CEDULA-EVACUADO,
+            "NOMBRE EVACUADO" = '@NOMBRE-EVACUADO',
+            /*
+            "CODIGO PRESUPUESTAL" = '@CODIGO-PRESUPUESTAL',
+            "CDP" = '@CDP',
+            "FECHA CDP" = '@FECHA-CDP',
+            */
+                
+            --"CDP" = '@cdp-selector',
+            
+            "NUM MESES" = @NUM-MESES,
+            "VALOR AYUDA MES" = @VALOR-AYUDA-MES,
+            "TOTAL" = @TOTAL,
+            "TOTAL MAS UN MES" = @TOT-MAS-UN-MES,
+                
+            /*
+            "INICIO PAGO" = CASE WHEN to_date('@INI-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-PAGO', 'DD/MM/YYYY') END,
+            "FIN PAGO" = CASE WHEN to_date('@FN-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FN-PAGO', 'DD/MM/YYYY') END,
+            */
+            /*
+            "RESOLUCION" = '@RESOLUCION',
+            "SOLICITUD RP" = '@SOLICITUD-RP',
+            "VALOR CDP TOTAL" = @VALOR-CDP-TOTAL,
+            "OBJETO SOLICITUD CRP" = '@OBJETO-SOLICITUD-CRP',
+            */
+            /*
+            "NUM MESES PAGAR" = @NUM-MES-PAGAR,
+            "MESES PAGAR" = '@MESES-PAGAR',
+            "TOTAL PAGAR" = @TOT-PAGAR,
+            */
+            /*
+            "APLICA 2B" = @APLICA-2B,
+            "INICIO 2B" = CASE WHEN to_date('@INI-2B', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-2B', 'DD/MM/YYYY') END,
+            */
+            "resolucion_estado" = '@resolucion_estado',
+            "observacion" = '@observacion',
+                
+            /*
+            "resolucion_marzo_fecha" = @resolucion_marzo_fecha,
+            "resolucion_marzo_usuario" = '@resolucion_marzo_usuario',
+            "resolucion_marzo_usr_cargo" = '@resolucion_marzo_usr_cargo',
+            */
+                
+            "resolucion_marzo_upd_fecha" = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS'),
+            "resolucion_marzo_upd_usuario" = '@resolucion_marzo_upd_usuario',
+            "resolucion_marzo_upd_usr_cargo" = '@resolucion_marzo_upd_usr_cargo',
+            --"resolucion_usuario_financiero" = '@resolucion_usuario_financiero',
+            --"resolucion_cargo_usuario_financiero" = '@resolucion_cargo_usuario_financiero',
+            "resolucion_usuario_tecnico" = '@resolucion_usuario_tecnico',
+            "resolucion_cargo_usuario_tecnico" = '@resolucion_cargo_usuario_tecnico'
+
+            WHERE
+            "IDENTIFICADOR" = '@IDENTIFICADOR'
+                
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>false</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarRevisionFinancieraResoluciones">
+        <sql>
+            
+            UPDATE resoluciones_marzo SET
+                
+                
+                
+            "CDP" = '@cdp-selector',
+            
+            "RESOLUCION" = '@RESOLUCION',
+            "SOLICITUD RP" = '@SOLICITUD-RP',
+            "VALOR CDP TOTAL" = @VALOR-CDP-TOTAL,
+            "OBJETO SOLICITUD CRP" = '@OBJETO-SOLICITUD-CRP',
+                
+            crp_fecha = CASE WHEN to_date('@crp_fecha', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@crp_fecha', 'DD/MM/YYYY') END,
+            crp_numero = '@crp_numero',
+            
+            "resolucion_estado" = '@resolucion_estado',
+            
+            "INICIO PAGO" = CASE WHEN to_date('@INI-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-PAGO', 'DD/MM/YYYY') END,
+            "FIN PAGO" = CASE WHEN to_date('@FN-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FN-PAGO', 'DD/MM/YYYY') END,
+                                
+            "resolucion_marzo_upd_fecha" = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS'),
+            "resolucion_usuario_financiero" = '@resolucion_usuario_financiero',
+            "resolucion_cargo_usuario_financiero" = '@resolucion_cargo_usuario_financiero'
+            WHERE
+            "IDENTIFICADOR" = '@IDENTIFICADOR'
+                
+            
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>false</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarDatosCuentas">
+        <sql>
+            
+            UPDATE contrato SET
+            "@nombre" = @tipo@value@tipo,
+            contrato_upd_user = '@USUARIO_SISTEMA', 
+            contrato_upd_time = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            claveunida = '@claveunida'
+            RETURNING "@nombre"
+                
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarFechasCuentas">
+        <sql>
+            
+            UPDATE contrato SET
+            "@nombre" = @tipo@value@tipo
+            WHERE
+            claveunida = '@claveunida'
+            RETURNING "@nombre"
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="CalcularValoresCuentasResolucionMarzo">
+        <sql>
+            
+            UPDATE cuentas_resoluciones_marzo
+            SET
+            dias_x_pagar = date_part( 'day', age("FIN VALIDO" + interval '1 day' , "INICIO VALIDO" ) )
+            ,meses_x_pagar = ( date_part( 'year', age("FIN VALIDO" + interval '1 day' , "INICIO VALIDO" ) ) * 12 ) + ( date_part( 'month', age("FIN VALIDO" + interval '1 day' , "INICIO VALIDO" ) ) ) 
+            ,total_pagar = ( 
+            round(valor_ayuda_mes * date_part( 'day', age("FIN VALIDO" + interval '1 day' , "INICIO VALIDO" ) ) / 30 ) +
+            (valor_ayuda_mes * 
+            ( 
+            ( date_part( 'year', age("FIN VALIDO" + interval '1 day' , "INICIO VALIDO" ) ) * 12 ) 
+            + 
+            ( date_part( 'month', age("FIN VALIDO" + interval '1 day' , "INICIO VALIDO" ) ) )
+            )
+            ) 
+            ) 
+            where "CLAVEUNIDA" = '@CLAVEUNIDA'
+            returning dias_x_pagar,meses_x_pagar,total_pagar
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarEstadoContrato">
+        <sql>
+            
+            UPDATE cuentas_resoluciones_marzo SET
+            incluir_contrato = @ACTIVO
+            WHERE
+            "CLAVEUNIDA" = '@CLAVEUNIDA'
+            
+                
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>false</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="InsertarNuevoContrato">
+        <sql>
+            INSERT INTO contrato
+            (
+            identificador ,
+            claveunida ,
+            consecontrato ,
+            cont_fecha_inicio ,
+            cont_fecha_fin ,
+            valor_ayuda_mes ,
+            titular_nombre ,
+            titular_cedula ,
+            cuenta_banco ,
+            cuenta_tipo ,
+            cuenta_numero ,
+            contrato_user ,
+            contrato_time,
+            
+            cont_direccion_predio,
+            cont_localidad_predio,
+            cont_upz_predio,
+            cont_barrio_predio,
+            cont_matricula_predio,
+            cont_chip_predio,
+            beneficiario_telefono
+            )
+            VALUES 
+            (
+            '@identificador',
+            '@identificador' || (select coalesce( max(consecontrato) + 1, 1) from contrato where identificador = '@identificador'),
+            (select coalesce( max(consecontrato) + 1, 1) from contrato where identificador = '@identificador'),
+            CASE WHEN to_date('@cont_fecha_inicio', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@cont_fecha_inicio', 'DD/MM/YYYY') END,
+            CASE WHEN to_date('@cont_fecha_fin', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@cont_fecha_fin', 'DD/MM/YYYY') END,
+            @valor_ayuda_mes,
+            '@titular_nombre',
+            '@titular_cedula',
+            @cuenta_banco,
+            '@cuenta_tipo',
+            '@cuenta_numero',
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS'),
+                
+            '@cont_direccion_predio',
+            CASE WHEN '@cont_localidad_predio' &lt;&gt; '' THEN '@cont_localidad_predio' ELSE null END,
+            CASE WHEN '@cont_upz_predio' &lt;&gt; '' THEN '@cont_upz_predio' ELSE null END,
+            '@cont_barrio_predio',
+            '@cont_matricula_predio',
+            '@cont_chip_predio',
+            '@telefono'
+            )
+            returning *
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarEstadoResoluciones">
+        <sql>
+            
+            UPDATE resoluciones_marzo SET
+            "@nombre" = @tipo@value@tipo
+            WHERE
+            "IDENTIFICADOR" = '@IDENTIFICADOR'
+            RETURNING "@nombre"
+                
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="actualizarNumeroResolucionConsecutivo">
+        <sql>
+            
+            UPDATE resoluciones_marzo SET
+            "RESOLUCION" = nextval('sequencia_resoluciones')
+            WHERE
+            "IDENTIFICADOR" = '@IDENTIFICADOR'
+            RETURNING "RESOLUCION"
+                
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarEstadoResolucionesMasivo">
+        <sql>
+            
+            UPDATE resoluciones_marzo SET
+            "@nombre" = @tipo@value@tipo
+            WHERE
+            "IDENTIFICADOR" in (@IDENTIFICADORES)
+            RETURNING "@nombre"
+                
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="GuardarNuevoMemorando">
+        <sql>
+            INSERT INTO memorando (identificador,resolucion,cdp,crp,inicio_pago,fin_pago) 
+            values(
+            '@IDENTIFICADOR',
+            '@RESOLUCION',
+            '@cdp_numero',
+            '@crp_numero',
+            CASE WHEN to_date('@INI-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-PAGO', 'DD/MM/YYYY') END,
+            CASE WHEN to_date('@FN-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FN-PAGO', 'DD/MM/YYYY') END
+            )
+            RETURNING id
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarAlertas">
+        <sql>
+            
+            UPDATE "ALERTAS RESOLUCIONES" SET
+            "@nombre" = @tipo@value@tipo
+            WHERE
+            "IDENTIFICADOR" = '@IDENTIFICADOR'
+            RETURNING "@nombre"
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="GuardarNuevoMemorando_desde_grafico">
+        <sql>
+            WITH
+            upd as (
+            UPDATE memorando SET
+            resolucion = '@RESOLUCION',
+            cdp = '@cdp_numero',
+            crp = '@crp_numero',
+            cordis = '@cordis',
+            inicio_pago = CASE WHEN to_date('@INI-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-PAGO', 'DD/MM/YYYY') END,
+            fin_pago = CASE WHEN to_date('@FN-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FN-PAGO', 'DD/MM/YYYY') END,
+            memorando_user = '@USUARIO_SISTEMA', 
+            memorando_fecha = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            identificador = '@IDENTIFICADOR' and id = @id
+            returning chart_id
+            ),
+            ins as (
+            INSERT INTO memorando ( 
+            id, 
+            identificador, 
+            resolucion, 
+            cdp, 
+            crp, 
+            cordis, 
+            inicio_pago, 
+            fin_pago,
+            memorando_user , 
+            memorando_fecha 
+            ) 
+            SELECT 
+            @id,
+            '@IDENTIFICADOR',
+            '@RESOLUCION',
+            '@cdp_numero',
+            '@crp_numero',
+            '@cordis',
+            CASE WHEN to_date('@INI-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-PAGO', 'DD/MM/YYYY') END,
+            CASE WHEN to_date('@FN-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FN-PAGO', 'DD/MM/YYYY') END,
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE NOT EXISTS (SELECT 1 FROM memorando WHERE identificador = '@IDENTIFICADOR' and id = @id)
+            returning chart_id
+            ) 
+            select * from ins union select * from upd;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="Eliminar_Memorando_desde_grafico">
+        <sql>
+            WITH
+            radicaciones as (
+            DELETE FROM grupo_radicacion_memorando
+            WHERE memorando_id = '@id'
+            ),
+            memos as (
+            DELETE FROM memorando 
+            WHERE
+            identificador = '@IDENTIFICADOR' and id = '@id'
+            returning id
+            )
+            select * from memos
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="Eliminar_Resolucion_desde_grafico">
+        <sql>
+            with cons as(
+            select id_resolucion, resolucion, identificador, res_modificatoria,
+            (case 
+            when res_modificatoria IS NOT NULL THEN (SELECT id_res_modificatoria FROM resolucion_modificacion where id_res_original=id_resolucion)
+		
+            end) as modif
+            ,
+            (case 
+            when res_modificatoria IS NULL THEN (SELECT id_res_original FROM resolucion_modificacion where (id_res_original=id_resolucion OR id_res_modificatoria=id_resolucion ))
+            end) as modificatoria
+	
+            from resolucion 
+            where identificador = '@IDENTIFICADOR' and resolucion = '@id'
+            ), 
+            bep as (	
+            UPDATE resolucion SET res_modificatoria=null where id_resolucion=(select modificatoria from cons) 		
+	
+            ),
+            del as (
+            delete from resolucion where id_resolucion= (select modif from cons)
+            ),
+            del2 as (
+            delete from resolucion where id_resolucion= (select id_resolucion from cons )
+            )       
+            select * from cons            
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>false</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="editar_resolucion_desde_grafico">
+        <sql>
+            UPDATE resolucion SET
+            fecha_inicio = CASE WHEN to_date('@fecha_inicio', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_inicio', 'DD/MM/YYYY') END,
+            fecha_fin = CASE WHEN to_date('@fecha_fin', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_fin', 'DD/MM/YYYY') END
+            WHERE
+            identificador = '@IDENTIFICADOR' and resolucion = '@id'
+            returning resolucion
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="insertar_resolucion_desde_grafico">
+        <sql>
+            INSERT INTO resolucion (  
+            identificador ,  
+            fecha_inicio ,  
+            fecha_fin,  
+            resolucion ,  
+            fecha_resolucion ,
+            cdp_id,
+            crp_numero,
+            crp_fecha,
+            resolucion_user,
+            resolucion_fecha
+            ) 
+            VALUES 
+            (
+            '@identificador',
+            CASE WHEN to_date('@fecha_inicio', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_inicio', 'DD/MM/YYYY') END,
+            CASE WHEN to_date('@fecha_fin', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_fin', 'DD/MM/YYYY') END,
+            '@resolucion',
+            CASE WHEN to_date('@fechaResolucion', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fechaResolucion', 'DD/MM/YYYY') END,
+            @cdp_id,
+            '@crp',
+            CASE WHEN to_date('@fechaCRP', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fechaCRP', 'DD/MM/YYYY') END,
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            )
+            returning id_resolucion
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="insertar_actualizar_resolucion_desde_grafico">
+        <sql>
+            WITH
+            upd as (
+            UPDATE resolucion SET
+            fecha_inicio =CASE WHEN to_date('@fecha_inicio', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_inicio', 'DD/MM/YYYY') END,
+            fecha_fin =CASE WHEN to_date('@fecha_fin', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_fin', 'DD/MM/YYYY') END,
+            resolucion ='@resolucion',
+            fecha_resolucion =CASE WHEN to_date('@fechaResolucion', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fechaResolucion', 'DD/MM/YYYY') END,
+            cdp_id = @cdp_id,
+            crp_numero ='@crp',
+            crp_fecha =CASE WHEN to_date('@fechaCRP', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fechaCRP', 'DD/MM/YYYY') END,
+            ties_res_id = @ties_res_id,
+            resolucion_observaciones = '@observaciones',
+            resolucion_usr_upd ='@USUARIO_SISTEMA', 
+            resolucion_time_upd =to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            id_resolucion = @id_resolucion
+            returning id_resolucion, 'UPDATE'::text as op
+            ),
+            ins as (
+            INSERT INTO resolucion (  
+            identificador ,  
+            fecha_inicio ,  
+            fecha_fin,  
+            resolucion ,  
+            fecha_resolucion ,
+            cdp_id,
+            crp_numero,
+            crp_fecha,
+            ties_res_id,
+            resolucion_observaciones,
+            resolucion_user,
+            resolucion_fecha
+            ) 
+            SELECT
+            '@identificador',
+            CASE WHEN to_date('@fecha_inicio', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_inicio', 'DD/MM/YYYY') END,
+            CASE WHEN to_date('@fecha_fin', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fecha_fin', 'DD/MM/YYYY') END,
+            '@resolucion',
+            CASE WHEN to_date('@fechaResolucion', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fechaResolucion', 'DD/MM/YYYY') END,
+            @cdp_id,
+            '@crp',
+            CASE WHEN to_date('@fechaCRP', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@fechaCRP', 'DD/MM/YYYY') END,
+            @ties_res_id,
+            '@observaciones',
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE NOT EXISTS (SELECT 1 FROM resolucion WHERE id_resolucion = @id_resolucion)
+            returning id_resolucion, 'INSERT'::text as op
+            ) 
+            select * from ins union select * from upd;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    
+    <Consulta id="insertar_observacion_identificador">
+        <sql>
+
+            INSERT INTO comentarios (  
+            identificador ,  
+            comen_desc ,  
+            comen_user,
+            comen_time
+            ) 
+            VALUES
+            (
+            '@identificador',
+            '@comen_desc',
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            )
+            returning comen_id, 'INSERT'::text as op
+            
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="insertar_editar_grupo_radicacion_memorando">
+        <sql>
+            WITH
+            upd as (
+            UPDATE grupo_radicacion SET
+            grurad_upd_user ='@USUARIO_SISTEMA', 
+            grurad_upd_time =to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            grurad_id = @grupoId
+            returning grurad_id, grurad_fecha, 'UPDATE'::text as op
+            ),
+            ins as (
+            INSERT INTO grupo_radicacion (  
+            grurad_fecha ,  
+            grurad_user ,  
+            grurad_time
+            ) 
+            SELECT
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS'),
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE NOT EXISTS (SELECT 1 FROM grupo_radicacion WHERE grurad_id = @grupoId)
+            returning grurad_id, grurad_fecha, 'INSERT'::text as op
+            ), 
+            grupo as (
+            select * from ins union select * from upd
+            ),
+            elim_anteriores as (
+            delete from grupo_radicacion_memorando where grurad_id in (select grurad_id from grupo) and memorando_id not in (@MEMORANDOS_IDS)
+            ),
+            inser_nuevos as (
+            insert into grupo_radicacion_memorando
+            select * from
+            (select (select grurad_id from grupo),unnest(ARRAY[ @MEMORANDOS_IDS ]) memorando_id ) a where memorando_id not in (select memorando_id from grupo_radicacion_memorando where grurad_id in (select grurad_id from grupo) )
+            returning *
+            )
+            select * from grupo
+            
+            
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="InsertarEditarMemorandoDesdeGrafico">
+        <sql>
+            WITH
+            upd as (
+            UPDATE memorando SET
+            resolucion = '@RESOLUCION',
+            cdp = (select cdp_numero::text from cdp where cdp_id = @cdp_numero),
+            crp = '@crp_numero',
+            cordis = '@cordis',
+            inicio_pago = CASE WHEN to_date('@INI-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-PAGO', 'DD/MM/YYYY') END,
+            fin_pago = CASE WHEN to_date('@FN-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FN-PAGO', 'DD/MM/YYYY') END,
+            ties_mem_id = @ties_mem_id,
+            memorando_user = '@USUARIO_SISTEMA', 
+            memorando_fecha = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            identificador = '@IDENTIFICADOR' and id = @id
+            returning id::text, 'UPDATE'::text as op
+            ),
+            ins as (
+            INSERT INTO memorando ( 
+            id, 
+            identificador, 
+            resolucion, 
+            cdp, 
+            crp, 
+            cordis, 
+            inicio_pago, 
+            fin_pago,
+            ties_mem_id,
+            memorando_user , 
+            memorando_fecha 
+            ) 
+            SELECT 
+            @id,
+            '@IDENTIFICADOR',
+            '@RESOLUCION',
+            (select cdp_numero::text from cdp where cdp_id = @cdp_numero),
+            '@crp_numero',
+            '@cordis',
+            CASE WHEN to_date('@INI-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@INI-PAGO', 'DD/MM/YYYY') END,
+            CASE WHEN to_date('@FN-PAGO', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@FN-PAGO', 'DD/MM/YYYY') END,
+            @ties_mem_id,
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE NOT EXISTS (SELECT 1 FROM memorando WHERE identificador = '@IDENTIFICADOR' and id = @id)
+            returning id::text, 'INSERT'::text as op
+            ) 
+            select * from ins union select * from upd;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="AsignarTarea">
+        <sql>
+            UPDATE actividad SET
+            actividad_usuario = '@actividad_usuario',
+            tiest_proc_id = 2,
+            actividad_asignacion_fecha = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            proceso_id= @proceso_id  AND
+            tipo_actividad_id = @tipo_actividad_id
+            returning 'ok'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="ActualizarTareaEnProceso">
+        <sql>
+            UPDATE actividad SET
+            tiest_proc_id = 3
+            WHERE
+            proceso_id= @proceso_id  AND
+            tipo_actividad_id = @tipo_actividad_id
+            returning 'ok'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="ActualizarTareaCompletada">
+        <sql>
+            WITH
+            upd as (
+            UPDATE actividad SET
+            tiest_proc_id = 4
+            ,actividad_activa = false
+            ,actividad_finalizacion_fecha = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            proceso_id= @proceso_id  AND
+            tipo_actividad_id = @tipo_actividad_id
+            returning proceso_id,tipo_actividad_id
+            ),
+            activar_siguientes as(
+            UPDATE actividad SET
+            actividad_activa = true
+            ,tiest_proc_id = 2
+            ,actividad_asignacion_fecha = to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            proceso_id = (select proceso_id from upd)
+            AND
+            tipo_actividad_id in( select tiact_id from tipo_actividad where actividad_previa = (select tipo_actividad_id from upd))
+            RETURNING proceso_id,tipo_actividad_id
+            )
+            select * from activar_siguientes union select * from upd;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="InsertarNuevoProceso">
+        <sql>
+            WITH
+            proc as (
+            INSERT INTO proceso ( 
+            identificador,
+            tiproc_id,
+            cordis_entrada,
+            cordis_fecha_entrada,
+            tiesproc_id,
+            proc_usuario,
+            proc_time
+            ) 
+            SELECT 
+            '@IDENTIFICADOR',
+            @tipo_proceso_id,
+            '@cordis_entrada',
+            to_timestamp('@cordis_fecha_entrada', 'DD/MM/YYYY HH24:MI:SS'),
+            1,
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            returning proc_id
+            ) ,
+            act as (
+            INSERT INTO actividad(
+            proceso_id ,
+            tipo_actividad_id ,
+            tiest_proc_id ,
+            actividad_usuario ,
+            actividad_asignacion_fecha,
+            actividad_activa
+            )
+            SELECT *, (SELECT actividad_previa is null FROM tipo_actividad WHERE  tiact_id = act)
+            FROM 
+            (
+            SELECT  
+            unnest(ARRAY[ (select proc_id from proc) ])
+            ,unnest(ARRAY[ @tipo_actividad_id ]) act
+            ,unnest(ARRAY[ 2 ])
+            ,unnest(ARRAY[ @usuario ])
+            ,unnest(ARRAY[ to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS') ])
+            ) a
+            RETURNING proceso_id,tipo_actividad_id
+            )
+            select * from act;
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="InsertarRevisionJuridicaNuevoContrato">
+        <sql>
+            
+            WITH
+            upd as (
+            UPDATE revision_nuevo_contrato SET
+            revcon_entrega_par= @revcon_entrega_par, 
+            revcon_completitud_contrato= @revcon_completitud_contrato, 
+            revcon_titularidad= @revcon_titularidad, 
+            revcon_certificacion_bancaria= @revcon_certificacion_bancaria,
+            revcon_vur_sin_seleccion=@revcon_vur_sin_seleccion, 
+            revcon_obs_entrega_par= '@revcon_obs_entrega_par', 
+            revcon_obs_completitud_contrato= '@revcon_obs_completitud_contrato', 
+            revcon_obs_titularidad= '@revcon_obs_titularidad', 
+            revcon_obs_certificacion_bancaria= '@revcon_obs_certificacion_bancaria', 
+            revcon_obs_vur_sin_seleccion='@revcon_obs_vur_sin_seleccion',
+            revcon_viable= @revcon_viable, 
+            revcon_fecha_inicio_ayuda = CASE WHEN to_date('@revcon_fecha_inicio_ayuda', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@revcon_fecha_inicio_ayuda', 'DD/MM/YYYY') END,
+            revcon_fecha_fin_ayuda = CASE WHEN to_date('@revcon_fecha_fin_ayuda', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@revcon_fecha_fin_ayuda', 'DD/MM/YYYY') END,
+            revcon_usuario= '@USUARIO_SISTEMA', 
+            revcon_time= to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            WHERE
+            revcon_cordis_solicitud = '@cordis' AND
+            identificador= '@identificador' 
+            returning revcont_id
+            ),
+            ins as (
+            INSERT INTO public.revision_nuevo_contrato(
+            revcon_cordis_solicitud, 
+            identificador, 
+            revcon_entrega_par, 
+            revcon_completitud_contrato, 
+            revcon_titularidad, 
+            revcon_certificacion_bancaria, 
+            revcon_vur_sin_seleccion,
+            revcon_viable, 
+            revcon_fecha_inicio_ayuda ,
+            revcon_fecha_fin_ayuda ,
+            revcon_usuario, 
+            revcon_time,
+            revcon_obs_entrega_par, 
+            revcon_obs_completitud_contrato , 
+            revcon_obs_titularidad, 
+            revcon_obs_certificacion_bancaria, 
+            revcon_obs_vur_sin_seleccion
+            )
+            SELECT 
+            '@cordis', 
+            '@identificador',
+            @revcon_entrega_par,
+            @revcon_completitud_contrato,
+            @revcon_titularidad,
+            @revcon_certificacion_bancaria,
+            @revcon_vur_sin_seleccion,
+            @revcon_viable,
+            CASE WHEN to_date('@revcon_fecha_inicio_ayuda', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@revcon_fecha_inicio_ayuda', 'DD/MM/YYYY') END,
+            CASE WHEN to_date('@revcon_fecha_fin_ayuda', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@revcon_fecha_fin_ayuda', 'DD/MM/YYYY') END,
+            '@USUARIO_SISTEMA', 
+            to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS'),
+            '@revcon_obs_entrega_par', 
+            '@revcon_obs_completitud_contrato',
+            '@revcon_obs_titularidad',
+            '@revcon_obs_certificacion_bancaria',
+            '@revcon_obs_vur_sin_seleccion'
+            
+            WHERE NOT EXISTS (SELECT 1 FROM revision_nuevo_contrato WHERE 
+            revcon_cordis_solicitud = '@cordis' AND
+            identificador= '@identificador' 
+            )
+            returning revcont_id
+            ),
+            activi as (
+            UPDATE actividad SET
+            puede_completarse = true
+            WHERE
+            proceso_id = @proceso_id AND  tipo_actividad_id = @tipo_actividad_id
+            )
+            select * from ins union select * from upd;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="ActualizarDatosOficioRespuestaRevisionNuevoContrato">
+        <sql>
+            WITH
+            upd as (
+            UPDATE proceso SET
+            noti_direccion = '@noti_direccion',
+            noti_barrio = '@noti_barrio',
+            noti_ciudad = '@noti_ciudad',
+            noti_localidad = '@noti_localidad',
+            noti_telefono = '@noti_telefono',
+            noti_nombre = $$@noti_nombre$$
+
+            WHERE
+            cordis_entrada = '@cordis' AND
+            identificador= '@identificador' 
+            returning proc_id
+            ),
+            activi as (
+            UPDATE actividad SET
+            puede_completarse = true
+            WHERE
+            proceso_id = @proceso_id AND  tipo_actividad_id = @tipo_actividad_id
+            )
+            select * from upd
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    
+    <Consulta id="ActualizarDatosCordisSalidaSolicitudNuevoContrato">
+        <sql>
+            WITH
+            upd as (
+            UPDATE proceso SET
+            cordis_salida = '@cordis_salida',
+            cordis_fecha_salida = to_timestamp('@cordis_fecha_salida', 'DD/MM/YYYY')
+
+            WHERE
+            cordis_entrada = '@cordis' AND
+            identificador= '@identificador' 
+            returning proc_id
+            ),
+            activi as (
+            UPDATE actividad SET
+            puede_completarse = true
+            WHERE
+            proceso_id = @proceso_id AND  tipo_actividad_id = @tipo_actividad_id
+            )
+            select * from upd
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="crear_resolucion_modificatoria">
+        <sql>
+            WITH ins1 AS (
+            SELECT * FROM resolucion 
+            WHERE resolucion='@resolucion' and identificador='@identificador'
+            order by fecha_resolucion desc limit 1
+            )
+            ,ins2 AS ( 
+            UPDATE resolucion
+            SET res_modificatoria='true', 
+            fecha_fin= ((SELECT fecha_fin FROM ins1) - interval '1 days')
+            WHERE id_resolucion=(select id_resolucion from ins1) 
+            RETURNING id_resolucion  	      
+            )
+            ,ins3 AS (
+            INSERT INTO resolucion(
+            identificador, fecha_inicio, fecha_fin, resolucion, 
+            fecha_resolucion, cdp_id, resolucion_user, resolucion_fecha, 
+            crp_numero, crp_fecha,  resolucion_usr_upd, 
+            resolucion_time_upd)
+            VALUES (
+            (SELECT identificador FROM ins1), 
+            (SELECT fecha_inicio FROM ins1), 
+            (SELECT fecha_fin FROM ins1), 
+            CONCAT((SELECT resolucion FROM ins1),'Modif.'), 
+            (SELECT fecha_resolucion FROM ins1), 
+            (SELECT cdp_id FROM ins1),
+            (SELECT resolucion_user FROM ins1), 
+            now(),
+            (SELECT crp_numero FROM ins1), 
+            (SELECT crp_fecha FROM ins1),
+            '@usuario',
+            now()              
+            )
+            RETURNING id_resolucion
+            )
+            ,ins4 AS (
+            INSERT INTO resolucion_modificacion(id_res_original,id_res_modificatoria, id_tipo_modificacion, justificacion)
+            VALUES (
+            (SELECT id_resolucion FROM ins1),
+            (SELECT id_resolucion FROM ins3),
+            @tipo,
+            '@justificacion'
+            )
+            )
+            SELECT id_resolucion FROM  ins3 
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="ActualizarTareaPuedeCompletarse">
+        <sql>
+            UPDATE actividad SET
+            puede_completarse = true
+            WHERE
+            proceso_id = @proceso_id AND  tipo_actividad_id = @tipo_actividad_id
+            returning 'ok'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+    <Consulta id="guardar_modificatoria">
+        <sql>
+            UPDATE resolucion_modificacion SET id_tipo_modificacion=@tipo, justificacion='@justificacion'
+            WHERE id_res_modificatoria=(select id_resolucion from resolucion where resolucion='@resolucion')
+            returning *
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>  
+    <Consulta id="guardar_actualizar_notificacion">
+        <sql>
+            WITH sel as (
+            Select * from resolucion where id_resolucion='@resolucion' and identificador='@identificador' 
+            ),
+            usu as (
+            select * from usuario where usuario_usuario='@usuario'
+            ),ups as(
+            UPDATE	res_notificacion
+            SET 	notificacion_fecha='@fecha', usuario_id=(select usuario_id from usu)
+            WHERE resolucion_id=(select id_resolucion from sel)
+            returning resolucion_id
+            ),ins as(
+            INSERT INTO res_notificacion(resolucion_id, notificacion_fecha, usuario_id)
+            select (select id_resolucion from sel),'@fecha' , (select usuario_id from usu)
+            WHERE NOT EXISTS (select 1 from ups )
+            returning resolucion_id	
+            )
+            select * from ups union select * from ins
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+        <es_dml_complejo>true</es_dml_complejo>
+    </Consulta>
+      
+    <Consulta id="InsertarNovedadSuspension_mantener">
+        <sql>
+            INSERT INTO suspenciones_relocalizacion(
+                identificador ,
+                susp_observaciones ,
+                susp_estado_ayuda ,
+                susp_user ,
+                susp_time
+            )
+            values(
+                '@identificador' ,
+                coalesce('@susp_observaciones',null) ,
+                coalesce(@susp_estado_ayuda,null),
+                '@USUARIO_SISTEMA', 
+                to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            )
+        </sql>
+        <conexion>atencion_reloca</conexion>
+
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="InsertarNovedadSuspension_descargos">
+        <sql>
+            INSERT INTO suspenciones_relocalizacion(
+                identificador ,
+                susp_observaciones ,
+                susp_cordis_entrada ,
+                susp_fecha_cordis_entrada ,
+                susp_user ,
+                susp_time
+            )
+            values(
+                '@identificador' ,
+                coalesce('@susp_observaciones',null) ,
+                coalesce('@susp_cordis_entrada',null) ,
+                CASE WHEN to_date('@susp_fecha_cordis_entrada', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@susp_fecha_cordis_entrada', 'DD/MM/YYYY') END,
+                '@USUARIO_SISTEMA', 
+                to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            )
+        </sql>
+        <conexion>atencion_reloca</conexion>
+
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="InsertarNovedadSuspension_suspender">
+        <sql>
+            INSERT INTO suspenciones_relocalizacion(
+                identificador ,
+                susp_concepto ,
+                susp_detalle ,
+                susp_observaciones ,
+                susp_cordis_salida ,
+                susp_fecha_cordis_salida ,
+                susp_estado_ayuda,
+                susp_user ,
+                susp_time
+            )
+            values(
+                '@identificador' ,
+                coalesce('@susp_concepto',null) ,
+                coalesce('@susp_detalle',null) ,
+                coalesce('@susp_observaciones',null) ,
+                coalesce('@susp_cordis_salida',null) ,
+                CASE WHEN to_date('@susp_fecha_cordis_salida', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@susp_fecha_cordis_salida', 'DD/MM/YYYY') END,
+                false,
+                '@USUARIO_SISTEMA', 
+                to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS')
+            )
+        </sql>
+        <conexion>atencion_reloca</conexion>
+
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="InsertarNovedadSuspension">
+        <sql>
+            INSERT INTO suspenciones_relocalizacion(
+                identificador ,
+                susp_concepto ,
+                susp_observaciones ,
+                susp_cordis_salida ,
+                susp_fecha_cordis_salida ,
+                susp_cordis_entrada ,
+                susp_fecha_cordis_entrada ,
+                susp_estado_ayuda ,
+                susp_user ,
+                susp_time ,
+                susp_detalle
+            )
+            values(
+                '@identificador' ,
+                coalesce('@susp_concepto',null) ,
+                coalesce('@susp_observaciones',null) ,
+                coalesce('@susp_cordis_salida',null) ,
+                CASE WHEN to_date('@susp_fecha_cordis_salida', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@susp_fecha_cordis_salida', 'DD/MM/YYYY') END,
+                coalesce('@susp_cordis_entrada',null) ,
+                CASE WHEN to_date('@susp_fecha_cordis_entrada', 'DD/MM/YYYY') = '0001-01-01 BC' THEN NULL ELSE to_date('@susp_fecha_cordis_entrada', 'DD/MM/YYYY') END,
+                coalesce(@susp_estado_ayuda,null),
+                '@USUARIO_SISTEMA', 
+                to_timestamp('@TIMESTAMP_SISTEMA', 'DD/MM/YYYY HH24:MI:SS'),
+                coalesce('@susp_detalle',null)
+            )
+        </sql>
+        <conexion>atencion_reloca</conexion>
+
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <!--Fabian-->
+    <Consulta id="InsertarLogUsuario">
+        <sql>INSERT INTO log_usuario(usuario,"timestamp",user_agent, referer) VALUES ('@USUARIO', current_timestamp, '@USER_AGENT', '@REFERER')</sql>
+        <conexion>atencion_reloca</conexion>
+
+        <permisos>*</permisos>
+    </Consulta>
+    
+</Consultas>    

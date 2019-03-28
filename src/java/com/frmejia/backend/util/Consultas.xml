@@ -1,0 +1,2090 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Consultas>
+    <Consulta id="consulta_estado_del_sistema">
+        <sql>
+            SELECT true estado;
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultarIdentificadorReas">
+        <sql>
+            select 
+            nombre as beneficiario_nombre,
+            cedula as beneficiario_cedula,
+            identifica as identificador_reas
+            , CASE WHEN contrato_fecha_inicio is NOT null THEN
+            to_char( contrato_fecha_inicio , 'DD/MM/YYYY') ELSE
+            to_char( 
+            (
+            select ini_cont from consulta_contratos where consulta_contratos.id = defiinitiva.identifica order by clave_cont desc limit 1
+            ) 
+            , 'DD/MM/YYYY')
+            END
+            as contrato_fecha_inicio
+
+            , CASE WHEN contrato_fecha_final is NOT null THEN
+            to_char( contrato_fecha_final , 'DD/MM/YYYY') 
+            WHEN 
+            exists (select * from
+            (
+            (
+            select id || cast(cons_contr as integer)::text || cast(cons_pro as integer)::text id from consulta_prorroga where id = defiinitiva.identifica order by cast(cons_contr as integer)::text || cast(cons_pro as integer)::text
+            )
+            union
+            (
+            select clave_cont id from consulta_contratos where id = defiinitiva.identifica order by id
+            )
+            ) a 
+            order by id desc
+            limit 1 offset 0
+            ) 	
+            then
+
+            to_char(
+            (
+            select fin from
+            (
+            (
+            select id || cast(cons_contr as integer)::text || cast(cons_pro as integer)::text id , fin_pro fin from consulta_prorroga where id = defiinitiva.identifica  order by cast(cons_contr as integer)::text || cast(cons_pro as integer)::text
+            )
+            union
+            (
+            select clave_cont id,fin_cont fin from consulta_contratos where id = defiinitiva.identifica order by id
+            )
+            ) a 
+            order by id desc
+            limit 1 offset 0
+            )
+            , 'DD/MM/YYYY') 
+			
+            END as contrato_fecha_final
+            , CASE WHEN contrato_ant_arrendador_diferente is NOT null THEN
+            contrato_ant_arrendador_diferente::text
+            ELSE
+            (
+            select (vigente::text = 'SI')::text  from consulta_contratos where consulta_contratos.id = defiinitiva.identifica order by clave_cont desc limit 1 offset 1
+            ) 
+            end as contrato_anterior_vigente
+            , contrato_ant_arrendador_diferente::text as contrato_ant_arrendador_diferente
+
+
+
+
+		
+            , CASE WHEN contrato_ant_fecha is NOT null THEN
+            to_char( contrato_ant_fecha , 'DD/MM/YYYY') 
+            WHEN 
+            exists (select * from
+            (
+            (
+            select id || cast(cons_contr as integer)::text || cast(cons_pro as integer)::text id from consulta_prorroga where id = defiinitiva.identifica order by cast(cons_contr as integer)::text || cast(cons_pro as integer)::text
+            )
+            union
+            (
+            select clave_cont id from consulta_contratos where id = defiinitiva.identifica order by id
+            )
+            ) a 
+            order by id desc
+            limit 1 offset 1
+            ) 	
+            then
+
+            to_char(
+            (
+            select fin from
+            (
+            (
+            select id || cast(cons_contr as integer)::text || cast(cons_pro as integer)::text id , fin_pro fin from consulta_prorroga where id = defiinitiva.identifica  order by cast(cons_contr as integer)::text || cast(cons_pro as integer)::text
+            )
+            union
+            (
+            select clave_cont id,fin_cont fin from consulta_contratos where id = defiinitiva.identifica order by id
+            )
+            ) a 
+            order by id desc
+            limit 1 offset 1
+            )
+            , 'DD/MM/YYYY') 
+			
+            END as contrato_ant_fecha
+
+
+                
+            , contrato_ant_soporte_acta_finalizacion::text as contrato_ant_soporte_acta_finalizacion
+            , poblacion::text as poblacion
+            , identificador_observaciones
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            docs_soporte_arrendatario as docs_soporte_arrendatario
+            , docs_soporte_arrendador as docs_soporte_arrendador
+            , docs_soporte_apoderado as docs_soporte_apoderado
+            , docs_soporte_observaciones as docs_soporte_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as documentos_soporte
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            contraste_ids_arrendatario as contraste_ids_arrendatario
+            , contraste_ids_arrendador as contraste_ids_arrendador
+            , contraste_ids_apoderado as contraste_ids_apoderado
+            , contraste_ids_observaciones as contraste_ids_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as contraste_documentos
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            contraste_titularidad_arrendatario as contraste_titulari_arrendatario
+            , contraste_titularidad_observaciones as contraste_titulari_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as contraste_titularidad
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            estudio_docs_positivo::text as estudio_docs_positivo
+            , estudio_docs_adenda::text as estudio_docs_adenda
+            , estudio_docs_aden_positivo::text as estudio_docs_aden_positivo
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as estudio_documentos
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            estudio_docs_511_positivo::text as estudio_docs_511_positivo
+            , estudio_docs_511_adenda::text as estudio_docs_511_adenda
+            , estudio_docs_511_aden_positivo::text as estudio_docs_511_aden_positivo
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as estudio_documen_511
+            , estudio_docs_observaciones
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            cert_tradi_arrendador as cert_tradi_arrendador
+            , calidad_arrendador as calidad_arrendador
+            , predio_arrendar_direccion as predio_arrendar_direccion
+            , predio_arrendar_vuc_direccion as predio_arrendar_vuc_direccion
+            , predio_arrendar_limitaciones::text as predio_arrendar_limitaciones
+            , predio_arrendar_observaciones as predio_arrendar_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as propiedad_predio
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            certi_bancaria_poder::text as certi_bancaria_poder
+            , certi_banc_arrendador_nombre
+            , certi_banc_arrendador_numero
+            , certi_banc_arrendador_banco
+            , certi_banc_apoderado_poder
+            , certi_banc_apoderado_nombre
+            , certi_banc_apoderado_numero
+            , certi_banc_apoderado_banco
+            , certi_banc_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as certificacion_bancaria
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            aplicacion_740::text as aplicacion_740
+            , acta_evacuacion_idiger::text as acta_evacuacion_idiger
+            , aplicac_740_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as valor_contrato
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            seleccion_vivienda::text as seleccion_vivienda
+            , selec_vivien_tipo
+            , selec_vivien_desistimiento::text as selec_vivien_desistimiento
+            , to_char( selec_vivien_fecha_seleccion , 'DD/MM/YYYY') as selec_vivien_fecha_seleccion
+            , selec_vivien_proyecto::text as selec_vivien_proyecto
+            , to_char( selec_vivien_fecha_entrega , 'DD/MM/YYYY') as selec_vivien_fecha_entrega
+            , to_char( contrato_primer_cont_fecha , 'DD/MM/YYYY') as contrato_primer_cont_fecha
+            , selec_viven_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as seleccion_de_vivienda
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            acta_entrega_par::text as acta_entrega_par
+            , to_char( acta_entre_par_fecha , 'DD/MM/YYYY') as acta_entre_par_fecha
+            , acta_entre_par_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as acta_par
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            traslado_acta_verificacion::text as traslado_acta_verificacion
+            , to_char( traslado_fecha , 'DD/MM/YYYY') as traslado_fecha
+            , traslado_observaciones
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as acta_verificacion_traslado
+            ,(
+            select row_to_json(t)
+            from (
+            select 
+            existe_carpeta_reas::text as existe_carpeta_reas
+            , existe_carpeta_reloca::text as existe_carpeta_reloca
+            , existe_contrato_revision::text as existe_contrato_revision
+            from revision_relocalizacion r where revision_relocalizacion.identificador_reas = r.identificador_reas
+            ) t
+            ) as existencia_carpetas
+                
+            from 
+            defiinitiva full join revision_relocalizacion on defiinitiva.identifica =  revision_relocalizacion.identificador_reas
+            where 
+            identifica =  '@identificador_reas' or revision_relocalizacion.identificador_reas =  '@identificador_reas'
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    
+    <Consulta id="reporte_revisiones_por_usuario">
+        <sql>
+            SELECT 
+            revision_relocalizacion.rev_reloca_usuario "Usuario" ,rev_reloca_fecha::date "Fecha",  count(*) as "Total de revisiones"
+            FROM 
+            public.revision_relocalizacion
+
+            group by rev_reloca_usuario , rev_reloca_fecha::date order by 1;
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_sabana_revisiones">
+        <sql>
+            
+
+            SELECT 
+
+            identificador_reas ,
+
+            existe_carpeta_reas ,
+            existe_carpeta_reloca ,
+            existe_contrato_revision ,
+
+            contrato_fecha_inicio ,
+            contrato_fecha_final ,
+            contrato_anterior_vigente ,
+            contrato_ant_arrendador_diferente ,
+            contrato_ant_fecha ,
+            contrato_ant_soporte_acta_finalizacion ,
+            poblacion ,
+            regexp_replace( identificador_observaciones , E'[\\n\\r;]+', ' ', 'g' ) identificador_observaciones ,
+            docs_soporte_arrendatario ,
+            docs_soporte_arrendador ,
+            docs_soporte_apoderado ,
+            regexp_replace( docs_soporte_observaciones , E'[\\n\\r;]+', ' ', 'g' ) docs_soporte_observaciones ,
+            contraste_ids_arrendatario ,
+            contraste_ids_arrendador ,
+            contraste_ids_apoderado ,
+            regexp_replace( contraste_ids_observaciones , E'[\\n\\r;]+', ' ', 'g' ) contraste_ids_observaciones ,
+            contraste_titularidad_arrendatario ,
+            regexp_replace( contraste_titularidad_observaciones , E'[\\n\\r;]+', ' ', 'g' ) contraste_titularidad_observaciones ,
+            estudio_docs_positivo ,
+            estudio_docs_adenda ,
+            estudio_docs_aden_positivo ,
+            estudio_docs_511_positivo ,
+            estudio_docs_511_adenda ,
+            estudio_docs_511_aden_positivo ,
+
+            regexp_replace(estudio_docs_observaciones  , E'[\\n\\r;]+', ' ', 'g' ) estudio_docs_observaciones ,
+
+            cert_tradi_arrendador ,
+            calidad_arrendador ,
+            predio_arrendar_direccion ,
+            predio_arrendar_vuc_direccion ,
+            predio_arrendar_limitaciones ,
+            regexp_replace( predio_arrendar_observaciones , E'[\\n\\r;]+', ' ', 'g' ) predio_arrendar_observaciones ,
+            certi_bancaria_poder ,
+            certi_banc_arrendador_nombre ,
+            certi_banc_arrendador_numero ,
+            certi_banc_arrendador_banco ,
+            certi_banc_apoderado_poder ,
+            certi_banc_apoderado_nombre ,
+            certi_banc_apoderado_numero ,
+            certi_banc_apoderado_banco ,
+            regexp_replace( certi_banc_observaciones , E'[\\n\\r;]+', ' ', 'g' ) certi_banc_observaciones ,
+            seleccion_vivienda ,
+            selec_vivien_tipo ,
+            selec_vivien_desistimiento ,
+            selec_vivien_fecha_seleccion ,
+            selec_vivien_proyecto ,
+            selec_vivien_fecha_entrega ,
+            regexp_replace( selec_viven_observaciones , E'[\\n\\r;]+', ' ', 'g' ) selec_viven_observaciones ,
+            aplicacion_740 ,
+            acta_evacuacion_idiger ,
+            contrato_primer_cont_fecha ,
+            acta_entrega_par ,
+            acta_entre_par_fecha ,
+            regexp_replace( acta_entre_par_observaciones , E'[\\n\\r;]+', ' ', 'g' ) acta_entre_par_observaciones ,
+            regexp_replace( aplicac_740_observaciones , E'[\\n\\r;]+', ' ', 'g' ) aplicac_740_observaciones ,
+            traslado_acta_verificacion ,
+            traslado_fecha ,
+            regexp_replace( traslado_observaciones , E'[\\n\\r;]+', ' ', 'g' ) traslado_observaciones ,
+            rev_reloca_fecha fecha_creacion,
+            rev_reloca_usuario usuario_creo,
+            rev_reloca_usr_cargo cargo_usuario_creo,
+            rev_reloca_upd_fecha fecha_actualizacion,
+            rev_reloca_upd_usuario usuario_actualiza,
+            rev_reloca_upd_usr_cargo cargo_usuario_actualiza
+
+
+
+
+            FROM 
+            revision_relocalizacion
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_listado_resoluciones">
+        <sql>
+            SELECT 
+                "IDENTIFICADOR" ,
+                "Cedula 1" as "CEDULA EVACUADO",
+                "Nombre 1" as "NOMBRE EVACUADO",
+                (EXISTS (SELECT 1 FROM "ALERTAS RESOLUCIONES" a WHERE a."IDENTIFICADOR" = definitiva."IDENTIFICADOR")) AS tiene_alertas,
+                ARRAY["Cedula 1"::text] &lt;&gt; (select distinct array_agg(titular_cedula) from contrato where contrato.identificador =  definitiva."IDENTIFICADOR" ) requiere_carta_autorizacion
+                ,coalesce(
+                    (select coalesce(sel_viv_estado_entrega || ' ','') || coalesce(to_char(sel_viv_fecha_entrega,'dd "de" TMMonth "de" yyyy'),'') || coalesce(' - ' || sel_viv_proyecto, '') from seleccion_vivienda where seleccion_vivienda.identificador = definitiva."IDENTIFICADOR" )
+                    ,(select coalesce( array_to_string(array_agg( entrega ),',') , '') from (select distinct coalesce("Vivienda nueva Estado Entregas" || ' ','') || coalesce("Vivienda nueva Fecha estimada entrega",'') as entrega from "ALERTAS RESOLUCIONES" a where definitiva."IDENTIFICADOR" = a."IDENTIFICADOR") a ) 
+                )as entrega_vivienda
+                ,(select to_char(sel_viv_fecha_entrega, 'yyyy-mm-dd') from seleccion_vivienda where seleccion_vivienda.identificador = definitiva."IDENTIFICADOR" ) as fecha_entrega_vivienda
+                , (CASE  
+                    WHEN  "Fecha Acta de entrega predio en riesgo a CVP" is null THEN 'NO TIENE'           
+                    ELSE to_char("Fecha Acta de entrega predio en riesgo a CVP",'dd "de" TMMonth "de" yyyy')
+                    END ) as fecha_acta
+                ,"Valor Ayuda Temporal","Fecha de Verificación de Traslado" ,
+                (SELECT "Des_Estado_Proceso" FROM  public."tbl_Estados_Procesos" est WHERE est."Cod_Estado_Proceso"=definitiva."Cod_Estado_Proceso" ) as proceso                    
+
+            from definitiva 
+		left join 
+		(
+		  select distinct identificador from contrato WHERE 
+		    ( cont_fecha_inicio &lt;= (CASE WHEN '' = '@fin' THEN (current_date + interval '10 year')::text ELSE '@fin' END)::date )
+		    AND 
+		    ( (CASE WHEN '' = '@inicio' THEN (current_date - interval '10 year')::text ELSE '@inicio' END)::date  &lt;= cont_fecha_fin )
+		) c on "IDENTIFICADOR" = identificador
+            where c.identificador is not null and "IDENTIFICADOR" ilike '%@IDENTIFICADOR%' 
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="consulta_avanzada_resoluciones">
+        <sql>
+            SELECT 
+            "IDENTIFICADOR" ,
+            to_char( "INICIO" , 'DD/MM/YYYY') "INICIO" ,
+            to_char( "FIN" , 'DD/MM/YYYY') "FIN" ,
+            "CEDULA EVACUADO" ,
+            "NOMBRE EVACUADO" ,
+            "CODIGO PRESUPUESTAL" ,
+            coalesce("CDP",'') "CDP" ,
+            to_char( "FECHA CDP"  , 'DD/MM/YYYY') "FECHA CDP" ,
+            "NUM MESES" ,
+            "VALOR AYUDA MES" ,
+            "TOTAL" ,
+            "TOTAL MAS UN MES" ,
+            to_char( "INICIO PAGO", 'DD/MM/YYYY')  "INICIO PAGO" ,
+            to_char( "FIN PAGO", 'DD/MM/YYYY')  "FIN PAGO" ,
+            "NUM MESES PAGAR" ,
+            "MESES PAGAR" ,
+            "TOTAL PAGAR" ,
+            "APLICA 2B",
+            to_char( "INICIO 2B" , 'DD/MM/YYYY') "INICIO 2B",
+            coalesce(resolucion_estado,'') resolucion_estado,
+            coalesce(custodia_expediente,'') custodia_expediente,
+            coalesce( resolucion_marzo_upd_usuario, '') resolucion_marzo_upd_usuario,
+            (EXISTS (SELECT 1 FROM "ALERTAS RESOLUCIONES" WHERE "IDENTIFICADOR" = resoluciones_marzo."IDENTIFICADOR")) AS tiene_alertas,
+            coalesce( "RESOLUCION", '') "RESOLUCION",
+            ARRAY["CEDULA EVACUADO"] &amp;&amp; (select distinct array_agg(titular_cedula) from cuentas_resoluciones_marzo where cuentas_resoluciones_marzo."IDENTIFICADOR" =  resoluciones_marzo."IDENTIFICADOR" ) requiere_carta_autorizacion
+            from resoluciones_marzo
+            %@filtros% 
+               
+                
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_datos_resolucion_marzo">
+        <sql>
+            SELECT 
+            "IDENTIFICADOR" ,
+            to_char( "INICIO" , 'DD/MM/YYYY') "INICIO" ,
+            to_char( "FIN" , 'DD/MM/YYYY') "FIN" ,
+            "CEDULA EVACUADO" ,
+            "NOMBRE EVACUADO" ,
+            "CODIGO PRESUPUESTAL" ,
+            "CDP" ,
+            to_char( "FECHA CDP"  , 'DD/MM/YYYY') "FECHA CDP" ,
+            "NUM MESES" ,
+            "VALOR AYUDA MES" ,
+            "TOTAL" ,
+            "TOTAL MAS UN MES" ,
+            to_char( "INICIO PAGO", 'DD/MM/YYYY')  "INICIO PAGO" ,
+            to_char( "FIN PAGO", 'DD/MM/YYYY')  "FIN PAGO" ,
+            "NUM MESES PAGAR" ,
+            "MESES PAGAR" ,
+            "TOTAL PAGAR" ,
+            "APLICA 2B",
+            to_char( "INICIO 2B" , 'DD/MM/YYYY') "INICIO 2B",
+            resolucion_estado,
+            resolucion_marzo_upd_usuario,
+            coalesce(resolucion_marzo_upd_usr_cargo,'') as resolucion_marzo_upd_usr_cargo,
+            coalesce( "RESOLUCION" ,'') as "RESOLUCION",
+            coalesce( "SOLICITUD RP" ,'') as "SOLICITUD RP",
+            "VALOR CDP TOTAL",
+            coalesce( "OBJETO SOLICITUD CRP" ,'Asignar la AYUDA TEMPORAL para relocalización transitoria a las familias de la Localidad de ' || (select "Localidad" from definitiva d where d."IDENTIFICADOR" = resoluciones_marzo."IDENTIFICADOR") || '. ID: ' || "IDENTIFICADOR" ) as "OBJETO SOLICITUD CRP",
+                
+            coalesce( NULLIF(resolucion_usuario_financiero , '') ,'Amanda Jara') as resolucion_usuario_financiero,
+            coalesce( NULLIF(resolucion_cargo_usuario_financiero , '') ,'Contrato No. 105 de 2016') as resolucion_cargo_usuario_financiero,
+            
+            coalesce( NULLIF(resolucion_usuario_tecnico , '') ,'Oscar Felipe Marlés Monje') as resolucion_usuario_tecnico,
+            coalesce( NULLIF(resolucion_cargo_usuario_tecnico, '') ,'Contrato No. 16 de 2016') as resolucion_cargo_usuario_tecnico,
+            coalesce( "observacion" ,'') as "observacion",
+            (select "Localidad" from definitiva d where d."IDENTIFICADOR" = resoluciones_marzo."IDENTIFICADOR") as localidad,
+            (select "Sector" from definitiva d where d."IDENTIFICADOR" = resoluciones_marzo."IDENTIFICADOR") as sector,
+            coalesce( crp_numero ,'') as crp_numero,
+            to_char( crp_fecha, 'DD/MM/YYYY') as crp_fecha
+            from resoluciones_marzo where "IDENTIFICADOR" = '@IDENTIFICADOR'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_contratos_por_identificador">
+        <sql>
+             SELECT 
+            identificador "IDENTIFICADOR" ,
+            claveunida "CLAVEUNIDA" ,
+            consecontrato "CONSECONTRATO" ,
+            to_char( cont_fecha_inicio , 'DD/MM/YYYY') contrato_fecha_inicio ,
+            to_char( cont_fecha_fin , 'DD/MM/YYYY') contrato_fecha_fin ,
+            to_char( cont_fecha_inicio , 'DD/MM/YYYY') "INICIO VALIDO" ,
+            to_char( cont_fecha_fin , 'DD/MM/YYYY') "FIN VALIDO" ,
+            date_part( 'day', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) )  as dias_x_pagar,
+            ( date_part( 'year', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) * 12 ) + ( date_part( 'month', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) )  as meses_x_pagar,
+            valor_ayuda_mes ,
+            ( 
+	      round(valor_ayuda_mes * date_part( 'day', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) / 30 ) +
+	      (valor_ayuda_mes * 
+		( 
+		  ( date_part( 'year', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) * 12 ) 
+		  + 
+		  ( date_part( 'month', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) )
+		)
+	      ) 
+	  ) total_pagar ,
+            titular_nombre ,
+            titular_cedula ,
+            (select "NombreBanco" from "BANCOS" WHERE "CODIGO" = cuenta_banco::text) cuenta_banco ,
+            cuenta_tipo ,
+            cuenta_numero ,
+            coalesce( cont_direccion_predio ,'') as cont_direccion_predio,
+            coalesce( cont_localidad_predio ,'') as cont_localidad_predio ,
+            coalesce( cont_upz_predio, '') as cont_upz_predio, 
+            coalesce( cont_barrio_predio, '') as cont_barrio_predio, 
+            coalesce( cont_matricula_predio ,'') as cont_matricula_predio, 
+            coalesce( cont_chip_predio ,'') as cont_chip_predio, 
+            coalesce( cont_municipio_predio, '') as cont_municipio_predio ,
+            coalesce( beneficiario_telefono, '') as beneficiario_telefono ,
+            true incluir_contrato
+            from contrato where identificador = '@IDENTIFICADOR'
+            order by consecontrato
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="CalcularActualizacionValoresCuentas">
+        <sql>
+            SELECT 
+                date_part( 'day', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) )  as dias_x_pagar,
+                ( date_part( 'year', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) * 12 ) + ( date_part( 'month', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) )  as meses_x_pagar,
+                ( 
+                    round(valor_ayuda_mes * date_part( 'day', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) / 30 ) +
+                    (valor_ayuda_mes * 
+                      ( 
+                        ( date_part( 'year', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) * 12 ) 
+                        + 
+                        ( date_part( 'month', age(cont_fecha_fin + interval '1 day' , cont_fecha_inicio ) ) )
+                      )
+                    ) 
+                ) total_pagar 
+            from contrato where claveunida = '@CLAVEUNIDA'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_saldos_cdp">
+        <sql>
+            SELECT cdp_id
+            ,cdp_numero
+            ,cdp_fecha
+            ,cdp_objeto
+            ,cdp_habilitado
+            ,to_char(cdp_valor_total, 'FM$999G999G999G999') cdp_valor_mostrar_total
+            ,cdp_valor_total
+            ,to_char(cdp_valor_disponible, 'FM$999G999G999G999') cdp_valor_mostrar_disponible
+            ,cdp_valor_disponible
+            ,(
+            cdp_valor_disponible - coalesce((
+            SELECT sum("TOTAL MAS UN MES")
+            FROM resoluciones_marzo
+            WHERE "CDP" = cdp_numero::TEXT
+            ), 0)
+            ) AS cdp_saldo_estimado
+            ,to_char((
+            cdp_valor_disponible - coalesce((
+            SELECT sum("TOTAL MAS UN MES")
+            FROM resoluciones_marzo
+            WHERE "CDP" = cdp_numero::TEXT
+            ), 0)
+            ), 'FM$999G999G999G999') cdp_saldo_mostrar_estimado
+            ,cdp_localidad
+            ,cdp_comunidad
+            ,cdp_sector
+            ,coalesce((
+            SELECT '01 Localidad'
+            FROM definitiva
+            WHERE "IDENTIFICADOR" = '@IDENTIFICADOR'
+            AND "Localidad" = cdp_localidad
+            )::TEXT, coalesce((
+            SELECT '02 Grupo étnico'
+            WHERE cdp_comunidad IS NOT NULL
+            )::TEXT, coalesce( (select '01 Localidad' where cdp_comunidad is null)::text ,NULL)::text )) AS grupo
+            ,(
+            (
+            SELECT cdp_id
+            FROM (
+            SELECT 1 AS prioridad
+            ,*
+            FROM cdp
+            WHERE (
+            cdp_habilitado and cdp_localidad = '@LOCALIDAD'
+            AND upper(cdp_comunidad) = (
+            SELECT upper("Sector")
+            FROM definitiva
+            WHERE "IDENTIFICADOR" = '@IDENTIFICADOR'
+            )
+            )
+
+            UNION
+
+            SELECT 2
+            ,*
+            FROM cdp
+            WHERE (
+            cdp_habilitado and cdp_localidad = '@LOCALIDAD'
+            AND upper(cdp_sector) = (
+            SELECT upper("Sector")
+            FROM definitiva
+            WHERE "IDENTIFICADOR" = '@IDENTIFICADOR'
+            )
+            AND upper(cdp_comunidad) IS NULL
+            )
+
+            UNION
+
+            SELECT 3
+            ,*
+            FROM cdp
+            WHERE (
+            cdp_habilitado and cdp_localidad = '@LOCALIDAD'
+            AND upper(cdp_sector) IS NULL
+            AND upper(cdp_comunidad) IS NULL
+            )
+            ORDER BY prioridad
+            ,cdp_fecha
+            ,cdp_id
+            ,cdp_saldo_estimado
+            ) a
+            WHERE (
+            cdp_valor_disponible - coalesce((
+            SELECT sum("TOTAL MAS UN MES")
+            FROM resoluciones_marzo
+            WHERE "CDP" = cdp_numero::TEXT
+            ), 0)
+            ) > @ASIGNACION limit 1
+            ) = cdp_id
+            ) AS seleccionado
+            FROM cdp
+            ORDER BY cdp_fecha,cdp_numero
+
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_cdp_disponibles">
+        <sql>
+            SELECT cdp.cdp_id
+                    ,cdp_numero
+                    ,cdp_fecha
+                    ,cdp_objeto
+                    ,cdp_habilitado
+                    ,to_char(cdp_valor_total, 'FM$999G999G999G999') cdp_valor_mostrar_total
+                    ,cdp_valor_total
+                    ,to_char(total_asignado, 'FM$999G999G999G999') total_asignado
+                    ,to_char(cdp_valor_disponible, 'FM$999G999G999G999') cdp_valor_mostrar_disponible
+                    ,cdp_valor_disponible
+                    ,(cdp_valor_disponible - total_asignado) AS cdp_saldo_estimado
+                    ,to_char((cdp_valor_disponible - total_asignado), 'FM$999G999G999G999') cdp_saldo_mostrar_estimado
+                    ,cdp_localidad
+                    ,cdp_comunidad
+                    ,cdp_sector
+                    ,CASE 
+                            WHEN cdp_habilitado
+                                    THEN 'CDP Activos'
+                            ELSE 'CDP Anteriores'
+                            END AS grupo
+            FROM cdp
+            LEFT JOIN (
+                    SELECT cdp_id
+                            ,sum(valor) total_asignado
+                    FROM (
+                            select distinct
+                              contrato.identificador "IDENTIFICADOR" ,
+                              resolucion,
+                              cdp_id,
+
+
+                                (
+                                  ( contrato.valor_ayuda_mes * ( date_part( 'day', age(fecha_fin + interval '1 day' , fecha_inicio  ) ) / 30 )) +
+                                  (   
+                                    contrato.valor_ayuda_mes * 
+                                    (
+                                      ( date_part( 'year', age(fecha_fin + interval '1 day' , fecha_inicio ) ) * 12 ) 
+                                      + 
+                                      ( date_part( 'month', age(fecha_fin + interval '1 day' , fecha_inicio ) ) )
+                                    )
+                                  ) +
+                                  contrato.valor_ayuda_mes
+                                ) as valor
+
+                             from resolucion left join contrato on contrato.identificador = resolucion.identificador
+                                    and ((cont_fecha_inicio &lt;= resolucion.fecha_fin) AND (resolucion.fecha_inicio &lt;= cont_fecha_fin))
+
+                            WHERE cdp_id IS NOT NULL 
+                            AND res_modificatoria IS NULL
+                            ) a
+                    GROUP BY cdp_id
+                    ) a ON a.cdp_id = cdp.cdp_id
+            ORDER BY cdp_fecha desc
+                    ,cdp_numero desc
+
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="reporte_saldos_cdp">
+        <sql>
+            SELECT cdp_id ,
+            cdp_numero ,
+            cdp_fecha ,
+            regexp_replace( cdp_objeto  , E'[\\n\\r;]+', ' ', 'g' ) cdp_objeto ,
+            to_char(cdp_valor_total , 'FM$999G999G999G999' ) cdp_valor_total  ,
+            to_char(cdp_valor_disponible , 'FM$999G999G999G999' ) cdp_valor_disponible ,
+            to_char( (cdp_valor_disponible - coalesce((select sum("TOTAL MAS UN MES") from resoluciones_marzo where "CDP" = cdp_numero::text), 0)) , 'FM$999G999G999G999' ) cdp_saldo_estimado ,
+            cdp_localidad ,
+            cdp_comunidad ,
+            cdp_sector
+            FROM cdp
+            ORDER BY cdp_fecha ,cdp_numero
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_numero_resoluciones_x_cdp">
+        <sql>
+            SELECT "CDP"::integer, count(*) numero_resoluciones FROM resoluciones_marzo  
+            where "CDP" &lt;&gt; 'XXX-CDP-XXX'
+            group by "CDP"::integer
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_nuevos_memorandos">
+        <sql>
+            SELECT id ,
+            regexp_replace( resolucion , E'[\\n\\r;]+', ' ', 'g' ) resolucion ,
+            regexp_replace( cdp , E'[\\n\\r;]+', ' ', 'g' ) cdp ,
+            regexp_replace( crp , E'[\\n\\r;]+', ' ', 'g' ) crp ,
+            inicio_pago ,
+            fin_pago ,
+            regexp_replace( identificador , E'[\\n\\r;]+', ' ', 'g' ) identificador ,
+            regexp_replace( cordis , E'[\\n\\r;]+', ' ', 'g' ) cordis ,
+            regexp_replace( memorando_user , E'[\\n\\r;]+', ' ', 'g' ) memorando_user ,
+            to_char( memorando_fecha , 'YYYY-MM-dd')  
+            from memorando
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_asignaciones_cdp_resoluciones">
+        <sql>
+            SELECT "CDP"
+            ,"IDENTIFICADOR"
+            ,"TOTAL MAS UN MES" AS "Valor asignado"
+            ,resolucion_estado AS "Estado"
+            ,"RESOLUCION"
+            ,(
+            SELECT "Localidad"
+            FROM definitiva d
+            WHERE d."IDENTIFICADOR" = r."IDENTIFICADOR"
+            ) AS "Localidad (segun identificador)"
+            ,(
+            SELECT "Sector"
+            FROM definitiva d
+            WHERE d."IDENTIFICADOR" = r."IDENTIFICADOR"
+            ) AS "Sector (segun identificador)"
+            ,(
+            SELECT cdp_localidad
+            FROM cdp d
+            WHERE d."cdp_numero"::TEXT = r."CDP"
+            ) AS "Localidad (segun CDP)"
+            ,(
+            SELECT cdp_comunidad
+            FROM cdp d
+            WHERE d."cdp_numero"::TEXT = r."CDP"
+            ) AS "Comunidad (segun CDP)"
+            ,(
+            SELECT cdp_sector
+            FROM cdp d
+            WHERE d."cdp_numero"::TEXT = r."CDP"
+            ) AS "Sector (segun CDP)"
+            FROM resoluciones_marzo r
+            WHERE "CDP" IS NOT NULL
+            AND "CDP" NOT IN (
+            'XXX-CDP-XXX'
+            ,''
+            )
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_resumen_resoluciones">
+        <sql>
+            SELECT 
+                resolucion.identificador "Identificador", 
+                "Cedula 1", 
+                "Nombre 1", 
+                definitiva."Localidad", 
+                definitiva."Sector", 
+                resolucion.fecha_inicio, 
+                resolucion.fecha_fin, 
+                (select cdp_numero from cdp where cdp.cdp_id = resolucion.cdp_id) as cdp, 
+                (select cdp_fecha from cdp where cdp.cdp_id = resolucion.cdp_id) as cdp_fecha, 
+                resolucion.resolucion,
+                resolucion.fecha_resolucion,
+                crp_numero as "Número CRP",
+                crp_fecha as "Fecha CRP",
+
+                (select ties_res_id from tipo_estado_resolucion where tipo_estado_resolucion.ties_res_id = resolucion.ties_res_id) as estado, 
+                regexp_replace( resolucion.resolucion_observaciones , E'[\\n\\r;]+', ' ', 'g' ) observacion, 
+                resolucion.resolucion_fecha "Fecha Creación", 
+                resolucion.resolucion_user "Creado por", 
+                resolucion.resolucion_time_upd "Ultima modificacion", 
+                resolucion.resolucion_usr_upd "Modificado por"
+            
+            FROM 
+                public.resolucion left join 
+                public.definitiva ON
+                    definitiva."IDENTIFICADOR" = resolucion.identificador
+           AND  res_modificatoria &lt;&gt; 'TRUE' 
+            order by id_resolucion;
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_grafico_saldos_cdp">
+        <sql>
+            SELECT cdp_numero
+            ,cdp_valor_disponible
+            ,(
+            SELECT sum("TOTAL MAS UN MES")
+            FROM resoluciones_marzo
+            WHERE "CDP" = cdp_numero::TEXT
+            ) valor_asignado
+            ,cdp_valor_disponible - (
+            SELECT sum("TOTAL MAS UN MES")
+            FROM resoluciones_marzo
+            WHERE "CDP" = cdp_numero::TEXT
+            ) saldo
+            ,'greenyellow' color
+            FROM cdp
+            WHERE (
+            SELECT sum("TOTAL MAS UN MES")
+            FROM resoluciones_marzo
+            WHERE "CDP" = cdp_numero::TEXT
+            ) IS NOT NULL
+            AND cdp_valor_disponible - (
+            SELECT sum("TOTAL MAS UN MES")
+            FROM resoluciones_marzo
+            WHERE "CDP" = cdp_numero::TEXT
+            ) &lt; 100000000
+
+            
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_grafico_estado_resoluciones">
+        <sql>
+            select 
+            case 
+            when (resolucion_estado = '' or resolucion_estado is null) then '00 Sin Estado'  
+            when resolucion_estado = 'Priorizado para revisión' then '01 Priorizado para revisión'
+            when resolucion_estado = 'Alistamiento de expediente' then '02 Alistamiento de expediente'
+            when resolucion_estado = 'Asignado' then '03 Asignado'
+            when resolucion_estado = 'Revisión Jurídica' then '04 Revisión Jurídica'
+            when resolucion_estado = 'Revisión Financiera' then '05 Revisión Financiera'
+            when resolucion_estado = 'Impresa - REAS' then '06 Impresa - REAS'
+            when resolucion_estado = 'Numeración' then '07 Numeración'
+            when resolucion_estado = 'Solicitud RP' then '08 Solicitud RP'
+            when resolucion_estado = 'Registrado' then '09 Registrado'
+            when resolucion_estado = 'Memorando' then '10 Memorando'
+            when resolucion_estado = 'Sin expediente' then '11 Sin expediente'
+            when resolucion_estado = 'NO PROCEDE!' then '12 NO PROCEDE!'
+            when resolucion_estado = 'Devolucion' then '13 Devolucion'
+
+            end as estado
+            ,count(*) total from resoluciones_marzo 
+            /*
+            where resolucion_estado is not null 
+            and resolucion_estado not in('')
+            */
+            group by estado 
+            
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="consulta_alerta_resolucion">
+        <sql>
+            SELECT 
+            "RESOLUCION DE ASIGNACIÓN"::text as "01 RESOLUCION DE ASIGNACIÓN" ,
+            "CDP"::text as "02 CDP" ,
+            "CRP"::text as "02 CRP" ,
+            to_char( "FECHA RESOLUCION ASIGNACION"  , 'DD/MM/YYYY' ) as "03 FECHA RESOLUCION ASIGNACION",
+            --to_char( "FECHA INICIO CONTRATO" , 'DD/MM/YYYY' ) as "04 a) FECHA INICIO ASIGNACIÓN",
+            --to_char( "FECHA VENCIMIENTO" , 'DD/MM/YYYY' ) as "04 b) FECHA FIN ASIGNACIÓN",
+            "CONSULTA-RELOC-GOVALOR AYUDA MES"::TEXT as "05 VALOR AYUDA",
+            "VALOR ASIGNACION" as "06 VALOR ASIGNACION",
+            "MESES ASIGNACION" as "07 MESES ASIGNACION",
+            "CDP ASIGNACIÓN"::TEXT AS "08 CDP ASIGNACIÓN",
+            to_char( "FECHA CDP ASIGNACION"  , 'DD/MM/YYYY' ) as "09 FECHA CDP ASIGNACION",
+            "PAGO ENERO" AS "10 PAGO ENERO" ,
+            "PAGO FEBRERO" AS "11 PAGO FEBRERO" ,
+            "PAGO MARZO" AS "12 PAGO MARZO" ,
+            "PAGO ABRIL" AS "13 PAGO ABRIL",
+            (select array_to_json(array_agg(row_to_json(a))) from (select "MES APAGAR",coalesce("ORDEN DE PAGO",'') "ORDEN DE PAGO", coalesce(("FECHA GIRO TESORERIA"::date)::text,'') "FECHA GIRO TESORERIA","RESOLUCION" ,  "FECHA RESOLUCION"::date "FECHA RESOLUCION" from pagos where pagos."IDENTIFICADOR" = "ALERTAS RESOLUCIONES"."IDENTIFICADOR") a ) as "14 OTROS PAGOS",
+                
+            "Vivienda nueva Proyecto" as "20 Vivienda nueva Proyecto",
+            "Vivienda nueva Estado" as "21 Estado del proceso",
+            "Vivienda nueva Estado Entregas" as "22 Estado de Entrega",
+            "Vivienda nueva Fecha estimada entrega" as "23 Fecha estimada entrega vivienda nueva"
+            FROM "ALERTAS RESOLUCIONES"
+            WHERE "IDENTIFICADOR" ='@IDENTIFICADOR'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="buscarDominioEstadosResolucion">
+        <sql>
+            SELECT 
+            * FROM estado_resolucion order by estado_resolucion_id
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    
+    
+    <Consulta id="consulta_arbol_resoluciones_memorandos">
+        <sql>
+            SELECT
+            r.id_resolucion,
+            r.identificador,
+            r.resolucion,
+            to_char( r.fecha_resolucion , 'DD/MM/YYYY' ) fecha_resolucion,
+            r.id_estado ,
+            r.cdp_id ,
+            (select cdp_numero from cdp where cdp.cdp_id = r.cdp_id) cdp_numero ,
+            r.crp_numero ,
+            r.resolucion_observaciones ,
+            r.res_modificatoria,
+            r.identificador,
+            to_char( r.crp_fecha , 'DD/MM/YYYY' ) crp_fecha ,
+            to_char( r.fecha_inicio , 'DD-MM-YYYY' ) fecha_inicio ,
+            to_char( r.fecha_fin , 'DD-MM-YYYY' ) fecha_fin ,
+            json_agg( row_to_json(m.*) ) as memorando,
+            (select id_tipo_modificacion from resolucion_modificacion where id_res_modificatoria=r.id_resolucion) as tipo_mod,
+            (select justificacion  from resolucion_modificacion where id_res_modificatoria=r.id_resolucion) as justificacion,
+            (select id_tipo_revocatoria from revocatoria rev where rev.id_resolucion=r.id_resolucion) as revocatoria,
+            (select resolucion_id from res_notificacion  where id_resolucion=resolucion_id) as res_notificada
+            FROM resolucion r
+            left JOIN 
+            (
+            select 
+            id ,
+            chart_id,
+            cordis,
+            resolucion ,
+            cdp ,
+            crp ,
+            to_char( inicio_pago , 'DD-MM-YYYY' ) inicio_pago ,
+            to_char( fin_pago , 'DD-MM-YYYY' ) fin_pago  ,
+            identificador ,
+            ties_mem_id ,
+            memorando_user,
+            to_char( memorando_fecha , 'DD/MM/YYYY' ) memorando_fecha
+            from memorando order by inicio_pago asc
+            ) m USING(resolucion, identificador)
+            where r.identificador = '@IDENTIFICADOR'
+            group by r.id_resolucion
+            order by fecha_inicio asc
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_contratos_identificador">
+        <sql>
+            SELECT
+            *
+            FROM contrato
+            where identificador = '@IDENTIFICADOR'
+            order by cont_fecha_inicio
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_estados_resoluciones">
+        <sql>
+            SELECT
+            tipo_estado_resolucion.ties_res_id as id,
+            ties_res_desc as desc,
+            selected
+            FROM tipo_estado_resolucion left join (select ties_res_id, true as selected from resolucion where identificador = '@IDENTIFICADOR' and resolucion = '@id') a on tipo_estado_resolucion.ties_res_id = a.ties_res_id
+            order by tipo_estado_resolucion.ties_res_id
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_estados_memorandos">
+        <sql>
+            SELECT
+            tipo_estado_memorando.ties_mem_id as id,
+            ties_mem_desc as desc,
+            selected
+            FROM tipo_estado_memorando left join (select ties_mem_id, true as selected from memorando where id = @id) a on tipo_estado_memorando.ties_mem_id = a.ties_mem_id
+            order by tipo_estado_memorando.ties_mem_id
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_bancos">
+        <sql>
+            SELECT
+            "CODIGO" as id,
+            "NombreBanco" as desc
+            FROM "BANCOS"
+            order by "NombreBanco"
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_observaciones_identificador">
+        <sql>
+            SELECT
+            comen_id ,
+            comen_desc,
+            coalesce( (select usuario_nombre from usuario where usuario_usuario = comen_user),comen_user) comen_user ,
+            to_char( comen_time, 'DD-MM-YYYY HH12:MI AM') comen_time,
+            identificador
+            FROM comentarios 
+            WHERE identificador = '@identificador'
+            ORDER BY comen_time::timestamp desc, comen_id desc
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_memorandos">
+        <sql>
+            select id::text, resolucion, cdp, crp, identificador, cordis, 
+            upper( to_char(inicio_pago ,'TMMonth YYYY' ) ) ||
+            CASE WHEN upper( to_char(inicio_pago ,'TMMonth YYYY' ) ) = upper( to_char(fin_pago ,'TMMonth YYYY' ) ) THEN
+            ''
+            ELSE
+            ' - ' || upper( to_char(fin_pago ,'TMMonth YYYY' ) )
+            END as periodo_pagar
+            from memorando 
+            WHERE 
+            cordis is not null and cordis &lt;&gt; '' 
+            AND cordis ilike '%@cordis%'
+            AND identificador ilike '%@identificador%';
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="consulta_grupos">
+        <sql>
+            SELECT * from
+            grupo_radicacion
+            WHERE 
+            grurad_fecha
+            BETWEEN
+            to_timestamp('@desde','YYYY-MM-DD') 
+            AND  to_timestamp('@hasta','YYYY-MM-DD') ;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta> 
+    <Consulta id="memorandos_x_grupo">
+        <sql>
+            SELECT grm.grurad_id, m.id::text, m.resolucion, m.cdp, m.crp, m.identificador, m.cordis, 
+                upper( to_char(m.inicio_pago ,'TMMonth YYYY' ) ) ||
+                CASE WHEN upper( to_char(m.inicio_pago ,'TMMonth YYYY' ) ) = upper( to_char(m.fin_pago ,'TMMonth YYYY' ) ) THEN
+                ''
+                ELSE
+                ' - ' || upper( to_char(m.fin_pago ,'TMMonth YYYY' ) )
+                END as periodo_pagar
+            from
+                memorando as m  , grupo_radicacion_memorando as grm 
+            WHERE 
+                grm.grurad_id=@idGrupo
+            AND
+                grm.memorando_id=m.id;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta> 
+    
+    
+    <Consulta id="reporte_archivo_plano_memorandos_financiera">
+        <sql>
+            select 
+            row_number() OVER () as "NO"
+            ,identificador "IDENTIFICADOR"
+            ,"NOMBRE EVACUADO"
+            ,'CC' as "TIPO IDENTIFICACION"
+            ,"CEDULA EVACUADO"
+            ,(select date_part('year',cdp_fecha) from cdp where cdp_numero::text = cdp) as "VIGENCIA PRESUPUESTO (CDP-RP)"
+            ,cdp as "CDP"
+            ,crp as "RP"
+            ,'ABONO_CUENTA' as "FORMA DE PAGO"
+
+            ,titular_nombre as "TITULAR CUENTA"
+            ,'CC' as "TIPO IDENTIFICACION2"
+            ,titular_cedula as "IDENTIFICACION TITULAR"
+            ,cuenta_banco as "ENTIDAD BANCARIA - ACH"
+            ,cuenta_numero::text as "NUMERO CUENTA"
+            ,upper(cuenta_tipo) as "TIPO DE CUENTA"
+            ,string_agg("MES",' - ') as "MES A PAGAR "
+
+
+            ,sum(dias_x_pagar) + ( sum(meses_x_pagar) * 30 ) as "DIAS"
+            --,"VALOR AYUDA MES"
+            ,sum(total_pagar) as "VALOR GIRO MES"
+
+            from
+            (
+            select 
+            contrato.identificador
+            ,date_part( 'day',
+            age(
+            CASE WHEN  cont_fecha_inicio + (interval '1 month' * (b.n))  > cont_fecha_fin THEN
+            cont_fecha_fin + interval '1 day'
+            ELSE
+            cont_fecha_inicio + (interval '1 month' * (b.n))
+            END
+            ,
+            cont_fecha_inicio + (interval '1 month' * (b.n -1))
+            )
+            ) as dias_x_pagar
+            ,date_part( 'month',
+            age(
+            CASE WHEN  cont_fecha_inicio + (interval '1 month' * (b.n))  > cont_fecha_fin THEN
+            cont_fecha_fin + interval '1 day'
+            ELSE
+            cont_fecha_inicio + (interval '1 month' * (b.n))
+            END
+            ,
+            cont_fecha_inicio + (interval '1 month' * (b.n -1))
+            )
+            ) as meses_x_pagar
+            ,valor_ayuda_mes "VALOR AYUDA MES"
+            ,(  round(valor_ayuda_mes * date_part( 'day',
+            age(
+            CASE WHEN  cont_fecha_inicio + (interval '1 month' * (b.n))  > cont_fecha_fin THEN
+            cont_fecha_fin + interval '1 day'
+            ELSE
+            cont_fecha_inicio + (interval '1 month' * (b.n))
+            END
+            ,
+            cont_fecha_inicio + (interval '1 month' * (b.n -1))
+            )
+            ) / 30
+            ) +
+            (valor_ayuda_mes * date_part( 'month',
+            age(
+            CASE WHEN  cont_fecha_inicio + (interval '1 month' * (b.n))  > cont_fecha_fin THEN
+            cont_fecha_fin + interval '1 day'
+            ELSE
+            cont_fecha_inicio + (interval '1 month' * (b.n))
+            END
+            ,
+            cont_fecha_inicio + (interval '1 month' * (b.n -1))
+            )
+            )
+            ) ) as total_pagar
+            , to_char( cont_fecha_inicio + (interval '1 month' * (b.n -1)), 'TMMonth "de" YYYY') as "MES"
+            , cont_fecha_inicio + (interval '1 month' * (b.n -1)) as mes_periodo
+            ,"Cedula 1" "CEDULA EVACUADO"
+            ,"Nombre 1" "NOMBRE EVACUADO"
+            ,titular_nombre 
+            ,titular_cedula 
+            ,cuenta_banco 
+            ,cuenta_tipo 
+            ,cuenta_numero
+            ,cdp
+            ,crp
+            ,(select date_part('year', cdp_fecha) from cdp where cdp.cdp_numero::text = memorando.cdp) vigencia_cdp
+            ,orden
+            from 
+            memorando 
+            join 
+            (
+            select row_number() OVER () orden, filtros_id from ( select unnest(ARRAY[ @MEMORANDOS_IDS ]) filtros_id ) a
+            ) filtros on filtros_id = id
+            join 
+            contrato on memorando.identificador = contrato.identificador
+            LEFT JOIN definitiva on contrato.identificador = definitiva."IDENTIFICADOR"
+
+            , generate_series(1,
+            ceil(
+            date_part( 'year', age( (cont_fecha_fin + interval '1 day' ) , cont_fecha_inicio ) ) * 12 +
+            date_part( 'month', age( (cont_fecha_fin + interval '1 day' ) , cont_fecha_inicio ) ) +
+            date_part( 'day', age( (cont_fecha_fin + interval '1 day' ) , cont_fecha_inicio ) ) / 30
+            )::integer
+            ) as b(n)
+            where 
+            /**Inicio filtros**/
+            (cont_fecha_inicio + (interval '1 month' * (b.n -1)), cont_fecha_inicio + (interval '1 month' * (b.n ))) OVERLAPS (memorando.inicio_pago,memorando.fin_pago)
+            /**Fin Filtros**/
+            order by orden, mes_periodo
+            ) a
+            group by
+            "IDENTIFICADOR"
+            ,"VALOR AYUDA MES"
+            ,"CEDULA EVACUADO"
+            ,"NOMBRE EVACUADO"
+            ,titular_nombre 
+            ,titular_cedula 
+            ,cuenta_banco 
+            ,cuenta_tipo 
+            ,cuenta_numero
+            ,cdp
+            ,crp
+            ,orden
+            order by orden
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    
+    
+    <Consulta id="reporte_contratos_pendientes_asignacion">
+        <sql>
+            SELECT 
+                con.identificador
+                ,con."MES"
+                ,valor_ayuda_mes
+              FROM (
+                      SELECT *
+                              , cont_fecha_inicio + (interval '1 month' * (b.n - 1)) as mes_pagar
+                              ,to_char(cont_fecha_inicio + (interval '1 month' * (b.n - 1)), 'YYYY/MM - TMMonth "de" YYYY') AS "MES"
+                      FROM contrato
+                              ,generate_series(1, ceil(date_part('year', age((cont_fecha_fin + interval '1 day'), cont_fecha_inicio)) * 12 + date_part('month', age((cont_fecha_fin + interval '1 day'), cont_fecha_inicio)) + date_part('day', age((cont_fecha_fin + interval '1 day'), cont_fecha_inicio)) / 30)::INTEGER) AS b(n)
+                      ) con
+              LEFT JOIN (
+                      SELECT to_char(fecha_inicio + (interval '1 month' * (b.n - 1)), 'YYYY/MM - TMMonth "de" YYYY') AS "MES"
+                              ,*
+                      FROM resolucion
+                              ,generate_series(1, ceil(date_part('year', age((fecha_fin + interval '1 day'), fecha_inicio)) * 12 + date_part('month', age((fecha_fin + interval '1 day'), fecha_inicio)) + date_part('day', age((fecha_fin + interval '1 day'), fecha_inicio)) / 30)::INTEGER) AS b(n)
+                      WHERE fecha_inicio IS NOT NULL
+                              AND fecha_fin IS NOT NULL
+                      ) res ON res.identificador = con.identificador
+                      AND res."MES" = con."MES"
+              LEFT JOIN seleccion_vivienda on seleccion_vivienda.identificador = con.identificador
+              WHERE
+
+                      res.identificador is null
+                      AND (mes_pagar, mes_pagar + INTERVAL '1 MONTH' - INTERVAL '1 DAY') OVERLAPS('2016-01-01', '2050-12-31')
+                      and mes_pagar &lt; seleccion_vivienda.sel_viv_fecha_entrega 
+              ORDER BY con.identificador, con."MES"
+
+        </sql>    
+        <!--sql>
+            select distinct
+            con."IDENTIFICADOR" as identificador, 
+            con."MES" "MES PENDIENTE DE ASIGNACIÓN" 
+            /*,to_char( (select "VALOR AYUDA MES" from "CR-PRINCIPAL" WHERE con."CLAVEUNIDA" = "CR-PRINCIPAL"."CLAVEUNIDA" ) , 'FM$999G999G999G999' ) 
+            ,string_agg( to_char( (select "VALOR AYUDA MES" from "CR-PRINCIPAL" WHERE con."CLAVEUNIDA" = "CR-PRINCIPAL"."CLAVEUNIDA" ) , 'FM$999G999G999G999' ) , ',') 
+            */
+            from
+            (
+            select *, to_char( "INICIO" + (interval '1 month' * (b.n -1)), 'YYYY/MM - TMMonth "de" YYYY') as "MES" from tabla_fechas_contratos_prorrogas,
+            generate_series(1,
+            ceil(
+            date_part( 'year', age( ("FIN" + interval '1 day' ) , "INICIO" ) ) * 12 +
+            date_part( 'month', age( ("FIN" + interval '1 day' ) , "INICIO" ) ) +
+            date_part( 'day', age( ("FIN" + interval '1 day' ) , "INICIO" ) ) / 30
+            )::integer
+            ) as b(n)
+            ) con
+            LEFT JOIN 
+            (
+            select to_char( fecha_inicio + (interval '1 month' * (b.n -1)), 'YYYY/MM - TMMonth "de" YYYY') as "MES" , *
+            from 
+            resolucion, 
+            generate_series(1,
+            ceil(
+            date_part( 'year', age( (fecha_fin + interval '1 day' ) , fecha_inicio ) ) * 12 +
+            date_part( 'month', age( (fecha_fin + interval '1 day' ) , fecha_inicio ) ) +
+            date_part( 'day', age( (fecha_fin + interval '1 day' ) , fecha_inicio ) ) / 30
+            )::integer
+            ) as b(n)
+            where fecha_inicio is not null and fecha_fin is not null
+            ) res
+            on con."IDENTIFICADOR" = res.identificador AND con."MES" = res."MES"
+
+            WHERE (con."INICIO" + (interval '1 month' * (con.n -1)) >= '2015-12-31') and (con."INICIO", con."FIN") OVERLAPS ('2015-12-31','2050-12-31') 
+            GROUP BY con."IDENTIFICADOR", con."MES", con."INICIO", con.n
+            HAVING string_agg(res."MES", ',') is NULL
+            ORDER BY con."IDENTIFICADOR", con."MES";
+        </sql-->
+        
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>      
+    
+    
+    <Consulta id="ConsultaUsuarioByNombre">
+        <sql>
+            select 
+            usuario_usuario as usuario_usuario,
+            usuario_nombre as usuario_nombre,
+            usuario_id as usuario_id,
+            usuario_pwd as usuario_pwd,
+            usuario_user as usuario_user,
+            usuario_time as usuario_time,
+            usuario_user_upd as usuario_user_upd,
+            usuario_time_upd as usuario_time_upd,
+            usuario_correo as usuario_correo,
+            usuario_cargo as usuario_cargo,
+            usuario_activo AND (usuario_fecha_vigencia &gt;= current_date) as usuario_activo,
+            usuario_fecha_vigencia as usuario_fecha_vigencia,
+            tius_id as tius_id,
+		
+            (select array_to_string(array_agg(funcionalidades),',') from (
+            select tifunc_id as funcionalidades
+            from Usuario ud 
+            join tipo_usuario_funcionalidad tuf on 
+            ud.tius_id=tuf.tius_id 
+            where ud.usuario_usuario = u.usuario_usuario
+            UNION
+            select tifunc_id as funcionalidades
+            from Usuario usua
+            join usuario_funcionalidad usfunc on usua.usuario_id=usfunc.usuario_id 
+            where usua.usuario_usuario = u.usuario_usuario) a
+            ) as funcionalidades,			    
+		
+            '' as municipios,
+            '' as regionales
+            
+            from 
+            Usuario u
+            where 
+            usuario_usuario = '@USUARIO'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaUsuarioByCorreo">
+        <sql>
+            select 
+            usuario_usuario as usuario_usuario,
+            usuario_nombre as usuario_nombre,
+            usuario_id as usuario_id,
+            usuario_pwd as usuario_pwd,
+            usuario_user as usuario_user,
+            usuario_time as usuario_time,
+            usuario_user_upd as usuario_user_upd,
+            usuario_time_upd as usuario_time_upd,
+            usuario_correo as usuario_correo,
+            usuario_cargo as usuario_cargo,
+            usuario_activo as usuario_activo,
+            usuario_fecha_vigencia as usuario_fecha_vigencia,
+            tius_id as tius_id,
+		
+            (select array_to_string(array_agg(funcionalidades),',') from (
+            select tifunc_id as funcionalidades
+            from Usuario ud 
+            join tipo_usuario_funcionalidad tuf on 
+            ud.tius_id=tuf.tius_id 
+            where ud.usuario_usuario = u.usuario_usuario
+            UNION
+            select tifunc_id as funcionalidades
+            from Usuario usua
+            join usuario_funcionalidad usfunc on usua.usuario_id=usfunc.usuario_id 
+            where usua.usuario_usuario = u.usuario_usuario) a
+            ) as funcionalidades,			    
+		
+            '' as municipios,
+            '' as regionales
+            
+            from 
+            Usuario u
+            where 
+            usuario_correo = '@CORREO'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="op_cedula">
+        <sql>
+            SELECT DISTINCT ON (id_pago) id_pago, res.identificador as identificador, documento,CR."NOMBRE EVACUADO" as nombre , cdp, res.resolucion as resolucion, crp, valor_crp, num_op, valor_op, fecha_pago
+            FROM  op_cruce_crp  op, "CR-PRINCIPAL" CR , resolucion res
+            WHERE ( documento LIKE '%@cedula%' OR res.identificador LIKE '%@cedula%' )  AND CR."CEDULA EVACUADO"::text=op.documento  AND res.id_resolucion=op.resolucion
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta> 
+    <Consulta id="consulta_grafico_crp">
+        <sql>           
+            SELECT res.identificador,  crp, valor_crp, res.resolucion ,(SUM(valor_op)) as pagado
+            FROM  op_cruce_crp  op, definitiva CR , resolucion res
+            WHERE res.identificador LIKE '@identificador'   AND CR."Cedula 1"::text=op.documento  AND res.id_resolucion=op.resolucion
+            GROUP BY crp, res.identificador,  valor_crp, res.resolucion
+            ORDER BY res.identificador  
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta> 
+    <Consulta id="op_cedula_arrendador">
+        <sql>
+            SELECT DISTINCT ON (id_pago) id_pago, res.identificador as identificador, documento, documento as nombre , cdp, res.resolucion as resolucion, crp, valor_crp, num_op, valor_op, fecha_pago
+            FROM  op_cruce_crp  op , resolucion res
+            WHERE ( documento LIKE '%@cedula%' OR res.identificador LIKE '%@cedula%' ) AND res.id_resolucion=op.resolucion
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta> 
+    
+    
+    <Consulta id="consulta_novedades_usuario">
+        <sql>
+            SELECT 
+            novedad_id
+            ,identificador
+            ,tinov_desc
+            ,tiesnov_desc
+            ,usuario_nombre
+            ,to_char(novedad_fecha,'dd "de" TMMonth "de" yyyy HH:MM') novedad_fecha
+            FROM 
+            novedad 
+            LEFT JOIN tipo_novedad ON tinov_id = tipo_novedad_id
+            LEFT JOIN tipo_estado_novedad ON tiesnov_id = tipo_estado_novedad_id
+            NATURAL JOIN usuario
+            WHERE
+            novedad_id in   
+            (
+            SELECT novedad_id
+            FROM 
+            (
+            select novedad_id
+            from 
+            Usuario ud 
+            join novedad_tipo_usuario tuf on ud.tius_id=tuf.tipo_usuario_id 
+            where usuario_usuario = '@USUARIO_SISTEMA'
+            UNION
+            select novedad_id
+            from Usuario usua
+            join novedad_usuario usfunc on usua.usuario_id=usfunc.usuario_id
+            where usuario_usuario = '@USUARIO_SISTEMA'
+            ) a
+            )
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    <Consulta id="consulta_comentarios_novedad">
+        <sql>
+            SELECT
+            comnov_id ,
+            comnov_desc,
+            coalesce( (select usuario_nombre from usuario where usuario_usuario = comnov_user ),comnov_user ) comnov_user ,
+            to_char( comnov_time, 'DD-MM-YYYY HH12:MI AM') comnov_time
+            
+            FROM comentario_novedad 
+            WHERE novedad_id = '@novedad_id'
+            ORDER BY comnov_time::timestamp desc, comnov_id desc
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="reporte_nuevos_contratos">
+        <sql>
+            SELECT 
+            *
+            FROM 
+            public.contrato
+            WHERE contrato_user is not null
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="reporte_memorandos_pendientes">
+        <sql>
+            SELECT 
+            res.identificador
+            ,res."MES"
+            , resolucion
+            , resolucion_fecha
+            , crp_numero
+            , crp_fecha
+            ,(select avg(a.valor_ayuda_mes) from
+            (
+            select distinct valor_ayuda_mes from contrato where contrato.identificador = res.identificador AND (cont_fecha_inicio, cont_fecha_fin) OVERLAPS 
+            (to_date(ano || '-' || mes , 'YYYY-mm-01') + INTERVAL '0 MONTH', to_date(ano || '-' || mes , 'YYYY-mm-01') + INTERVAL '1 MONTH' - INTERVAL '1 DAY') 
+            ) a ) as valor_ayuda_mes,
+            (select count(a.valor_ayuda_mes) from
+            (
+            select distinct valor_ayuda_mes from contrato where contrato.identificador = res.identificador AND (cont_fecha_inicio, cont_fecha_fin) OVERLAPS 
+            (to_date(ano || '-' || mes , 'YYYY-mm-01') + INTERVAL '0 MONTH', to_date(ano || '-' || mes , 'YYYY-mm-01') + INTERVAL '1 MONTH' - INTERVAL '1 DAY') 
+            ) a ) as numero_contratos
+            FROM (
+            SELECT distinct identificador
+            ,resolucion
+            ,crp_numero
+            ,resolucion_fecha
+            ,crp_fecha
+            , fecha_inicio
+            , fecha_fin
+            ,fecha_inicio + (interval '1 month' * (b.n - 1) ) as mes_pagar
+            ,date_part('year', fecha_inicio + (interval '1 month' * (b.n - 1) ))  ano
+            ,date_part('month', fecha_inicio + (interval '1 month' * (b.n - 1) ))  mes
+            ,to_char(fecha_inicio + (interval '1 month' * (b.n - 1)), 'YYYY/MM - TMMonth "de" YYYY') AS "MES"
+            FROM resolucion
+            ,generate_series(1, ceil(date_part('year', age((fecha_fin + interval '1 day'), fecha_inicio)) * 12 + date_part('month', age((fecha_fin + interval '1 day'), fecha_inicio)) + date_part('day', age((fecha_fin + interval '1 day'), fecha_inicio)) / 30)::INTEGER) AS b(n)
+            WHERE fecha_inicio IS NOT NULL
+            AND fecha_fin IS NOT NULL
+            ) res
+            LEFT JOIN (
+            SELECT distinct identificador
+            ,to_char(inicio_pago + (interval '1 month' * (b.n - 1)), 'YYYY/MM - TMMonth "de" YYYY') AS "MES"
+            FROM memorando
+            ,generate_series(1, ceil(date_part('year', age((fin_pago + interval '1 day'), inicio_pago)) * 12 + date_part('month', age((fin_pago + interval '1 day'), inicio_pago)) + date_part('day', age((fin_pago + interval '1 day'), inicio_pago)) / 30)::INTEGER) AS b(n)
+            ) mem ON mem.identificador = res.identificador
+            AND mem."MES" = res."MES"
+            LEFT JOIN seleccion_vivienda on seleccion_vivienda.identificador = res.identificador
+            WHERE
+            mem.identificador is null
+            and (fecha_fin-fecha_inicio) &gt; 0
+            and mes_pagar &lt; seleccion_vivienda.sel_viv_fecha_entrega 
+            ORDER BY res.identificador, res."MES"
+
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_actividades_usuario">
+        <sql>
+            SELECT 
+            proceso_id
+            ,tipo_actividad_id
+            ,cordis_entrada
+            ,identificador
+            ,tiproc_desc proceso
+            ,tiact_desc actividad
+            ,tiesproc_desc estado
+            ,to_char(actividad_asignacion_fecha,'dd "de" TMMonth "de" yyyy HH:MM') fecha_asignacion
+            ,(select usuario_nombre from usuario where usuario_usuario = actividad_usuario)
+            FROM
+            actividad
+            LEFT JOIN tipo_estado_proceso ON tiesproc_id = tiest_proc_id
+            LEFT JOIN tipo_actividad ON tiact_id = tipo_actividad_id
+            LEFT JOIN proceso ON proc_id = proceso_id
+            LEFT JOIN tipo_proceso ON tipo_proceso.tiproc_id = proceso.tiproc_id
+            WHERE 
+            actividad_usuario = '@USUARIO_SISTEMA' AND tiest_proc_id in (2,3)
+            AND actividad_activa
+            ORDER BY  tiact_id, proc_id
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    <Consulta id="consulta_arbol_actividades">
+        <sql>
+            SELECT 
+            proceso_id
+            ,tipo_actividad_id::text tipo_actividad_id
+            ,actividad_previa::text actividad_previa
+            ,identificador
+            ,tiproc_desc proceso
+            ,tiact_desc actividad
+            ,tiesproc_desc estado
+            ,tiest_proc_id
+            ,to_char(actividad_asignacion_fecha,'dd "de" TMMonth "de" yyyy HH:MM') fecha_asignacion
+            ,(select usuario_nombre from usuario where usuario_usuario = actividad_usuario)
+            ,actividad_usuario
+            ,operacion
+            ,CASE WHEN requiere_operacion THEN puede_completarse ELSE true END as puede_completarse
+            ,cordis_entrada
+            ,cordis_salida
+            ,noti_direccion
+            ,noti_ciudad
+            ,noti_barrio
+            ,(select localidad_id || ' - ' || localidad_desc from localidad where localidad_id = noti_localidad)noti_localidad 
+            ,noti_telefono 
+            ,noti_nombre
+            FROM
+            actividad
+            LEFT JOIN tipo_estado_proceso ON tiesproc_id = tiest_proc_id
+            LEFT JOIN tipo_actividad ON tiact_id = tipo_actividad_id
+            LEFT JOIN proceso ON proc_id = proceso_id
+            LEFT JOIN tipo_proceso ON tipo_proceso.tiproc_id = proceso.tiproc_id
+            WHERE 
+            proceso_id = @proceso
+            ORDER BY proc_id, tiact_id
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    <Consulta id="info_calculo">
+        <sql>
+            SELECT 
+            * 
+            FROM 
+            opcion, 
+            componente
+            WHERE 
+            opcion.id_componente = componente.id_componente
+            AND   componente.activo=true
+            ORDER BY
+            opcion.id_componente ASC
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="componentes">
+        <sql>
+            SELECT id_componente, nombre, val_max, activo
+            FROM componente
+            WHERE activo=true
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    <Consulta id="info_beneficiario">
+        <sql>
+            SELECT "IDENTIFICADOR", "Nombre 1", "Cedula 1", 
+            "Nombre 2", "Cedula 2", "No Familias", "Fecha de Ingreso al Proceso", 
+            "Concepto de Ingreso"
+            FROM definitiva
+            WHERE
+            "Cedula 1" = @numero
+            OR
+            "IDENTIFICADOR" LIKE '%@numero%' LIMIT 1
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    <Consulta id="salvar_calculo">
+        <sql> 
+            INSERT INTO calculo_ayuda(
+            identificador, valor_ayuda, fecha, id_persona)
+            VALUES ('@identificador' , round(@total), current_date, '@cedula'); 
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    <Consulta id="salvar_opciones">
+        <sql> 
+            SELECT save_calculo('@opciones','@identificador' ,@total,'@cedula');          
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    
+    
+    <Consulta id="consulta_usuarios_asignar_tarea">
+        <sql> 
+            select
+            (select tius_desc from tipo_usuario where tipo_usuario.tius_id = usuario.tius_id)|| ' | ' ||usuario_nombre as desc
+            ,usuario_usuario as id
+            ,(select actividad_usuario = usuario_usuario from actividad where proceso_id = @proceso_id and tipo_actividad_id =@tipo_actividad_id) selected
+            FROM usuario
+            order by (select tius_desc from tipo_usuario where tipo_usuario.tius_id = usuario.tius_id)|| ' | ' ||usuario_nombre 
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    <Consulta id="consulta_tipos_procesos">
+        <sql> 
+            select
+            tiproc_id as id,
+            tiproc_desc as desc
+            FROM tipo_proceso
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    
+    <Consulta id="consulta_actividades_proceso">
+        <sql>
+            SELECT 
+            tiproc_id proceso_id
+            ,tiact_id::text tipo_actividad_id
+            ,actividad_previa::text actividad_previa
+            ,tiact_desc actividad
+            ,usuario_defecto
+            ,(select usuario_nombre from usuario where usuario_usuario = usuario_defecto) usuario_nombre
+            
+            FROM
+            tipo_actividad
+            LEFT JOIN tipo_proceso ON tipo_proceso_id = tiproc_id
+            WHERE 
+            tiproc_id = @proceso
+            ORDER BY tiproc_id, tiact_id
+        </sql>
+        <conexion>localhost</conexion>
+        <permisos>*</permisos>
+    </Consulta>    
+    
+    
+    <Consulta id="consulta_localidades">
+        <sql>
+            SELECT
+            localidad_id as id,
+            localidad_id || ' - ' || localidad_desc as desc
+            FROM localidad
+            order by localidad_id || ' - ' || localidad_desc
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="valor_calculo">
+        <sql>
+            SELECT valor_ayuda as valor
+            FROM calculo_ayuda
+            WHERE identificador like '%@identificador%'
+            order by fecha desc limit 1
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="valor_ayuda">
+        <sql>
+            SELECT  valor_ayuda_mes as valor
+            FROM contrato WHERE identificador LIKE '%@identificador%' 
+            order by cont_fecha_fin desc limit 1
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="consulta_upz_x_localidad">
+        <sql>
+            SELECT
+            upz_id as id,
+            upz_desc as desc
+            FROM upz
+            WHERE localidad_id = '@id'
+            order by upz_desc
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="ConsultaRevisionJuridicaNuevoContrato">
+        <sql>
+            SELECT 
+            revcon_cordis_solicitud ,
+            revcon_entrega_par ,
+            revcon_completitud_contrato ,
+            revcon_titularidad ,
+            revcon_certificacion_bancaria ,
+            revcon_vur_sin_seleccion,
+            identificador ,
+            revcon_viable ,
+            revcon_usuario ,
+            revcon_time ,
+            revcon_obs_entrega_par ,
+            revcon_obs_completitud_contrato ,
+            revcon_obs_titularidad ,
+            revcon_obs_certificacion_bancaria ,
+            revcon_obs_vur_sin_seleccion,
+            to_char( revcon_fecha_inicio_ayuda , 'DD/MM/YYYY') revcon_fecha_inicio_ayuda ,
+            to_char( revcon_fecha_fin_ayuda , 'DD/MM/YYYY') revcon_fecha_fin_ayuda
+            FROM revision_nuevo_contrato where revcon_cordis_solicitud = '@cordis' AND identificador = '@identificador'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaListaNovedadesEnProceso">
+        <sql>
+            SELECT 
+            tiproc_desc,
+            * 
+            FROM 
+            proceso 
+            LEFT JOIN tipo_proceso ON tipo_proceso.tiproc_id = proceso.tiproc_id
+            WHERE identificador  = '@identificador'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaDatosOficioRespuestaNuevoContrato">
+        <sql>
+            SELECT 
+            * 
+            FROM 
+            proceso 
+            WHERE identificador  = '@identificador' AND cordis_entrada = '@cordis'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaDatosCordisSalidaSolicitudNuevoContrato">
+        <sql>
+            SELECT 
+            identificador,
+            cordis_entrada,
+            cordis_salida,
+            to_char( cordis_fecha_entrada, 'DD/MM/YYYY') cordis_fecha_entrada,
+            to_char( cordis_fecha_salida, 'DD/MM/YYYY') cordis_fecha_salida
+            FROM 
+            proceso 
+            WHERE identificador  = '@identificador' AND cordis_entrada = '@cordis'
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consulta_localidad_oficio_respuesta_revision_nuevo_contrato">
+        <sql>
+            SELECT
+            localidad_id as id,
+            localidad_id || ' - ' || localidad_desc as desc,
+            CASE WHEN localidad_id = '@id' THEN true ELSE false END as selected
+            FROM localidad
+            order by localidad_id || ' - ' || localidad_desc
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="consultar_beneficiario">
+        <sql>
+            SELECT   "IDENTIFICADOR" as identificador, "Nombre 1" as nombre, "Cedula 1" as cedula 
+            FROM definitiva 
+            WHERE "IDENTIFICADOR" LIKE '%@identificador%' 
+            AND "Cod_Estado_Proceso" &lt;&gt; 20
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="consultar_usuario">
+        <sql>
+            SELECT usuario_activo
+            FROM usuario
+            WHERE  usuario_correo='@email' and  usuario_activo=TRUE
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaIndicadorTotalFamiliasReas">
+        <sql>
+            select count(*) as total from definitiva where "Cod_Estado_Proceso" in(1,2,4,5,6,7,8)
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaIndicadorTotalFamiliasReloca">
+        <sql>
+            SELECT contratos as total, round(contratos::numeric/reas::numeric * 100,2) || '%' as subtotal from
+            (
+            select count(*) reas from definitiva where "Cod_Estado_Proceso" in(1,2,4,5,6,7,8)
+            ) reas,
+            (
+            select count(distinct identificador) contratos from contrato 
+            where cont_fecha_fin &gt; date_trunc('month',now()) and cont_fecha_inicio &lt; (date_trunc('month',now()) + interval '1 month')
+            ) contratos
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaIndicadorTotalResoluciones">
+        <sql>
+            SELECT resoluciones as total, round(resoluciones::numeric/contratos::numeric*100,2) || '%' as subtotal FROM
+            (
+            SELECT 
+            count(distinct identificador ) contratos
+            FROM
+            contrato 
+            WHERE now() between cont_fecha_inicio  and cont_fecha_fin 
+            ) contratos,
+            (              
+            SELECT count(distinct identificador) as resoluciones
+            FROM
+            resolucion
+            WHERE
+            now() between fecha_inicio and fecha_fin
+            ) resoluciones
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaIndicadorTotalMemorandos">
+        <sql>
+            SELECT memorandos as total, round(memorandos::numeric/resoluciones::numeric*100,1) || '%' as subtotal FROM
+            (              
+            SELECT count(distinct identificador) as resoluciones
+            FROM
+            resolucion
+            WHERE
+            now() between fecha_inicio and fecha_fin
+            ) resoluciones,
+            (              
+            SELECT count(distinct identificador) as memorandos
+            FROM
+            memorando
+            WHERE
+            now() between inicio_pago and fin_pago
+            ) memorandos
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaIndicadorGraficoAvanceMensual">
+        <sql>
+            select *,
+            date_trunc('month',fecha_inicio + (interval '1 month' * (b.n -1))) as mes
+            ,(select count(distinct identificador) contratos from contrato where date_trunc('month',fecha_inicio + (interval '1 month' * (b.n -1))) between cont_fecha_inicio and cont_fecha_fin)
+            ,(select count(distinct identificador) resoluciones from resolucion where date_trunc('month',a.fecha_inicio + (interval '1 month' * (b.n -1))) between resolucion.fecha_inicio and resolucion.fecha_fin)
+            ,(select count(distinct identificador) memorandos from memorando where date_trunc('month',a.fecha_inicio + (interval '1 month' * (b.n -1))) between inicio_pago and fin_pago)
+            from
+            (select date_trunc('year',now()) as fecha_inicio, now()::date as fecha_fin) a,
+            generate_series(1,
+            ceil(
+            date_part( 'year', age( date_trunc('year',date_trunc('month',fecha_fin) + (interval '1 month') - (interval '1 day') ), date_trunc('year',date_trunc('month',fecha_inicio)) ) ) * 12 +
+            date_part( 'month', age( date_trunc('month',date_trunc('month',fecha_fin) + (interval '1 month') - (interval '1 day') ), date_trunc('month',date_trunc('month',fecha_inicio)) ) ) +
+            date_part( 'day', age( date_trunc('day',date_trunc('month',fecha_fin) + (interval '1 month') - (interval '1 day') ), date_trunc('day',date_trunc('month',fecha_inicio)) ) ) / 30
+            )::integer
+            ) as b(n)
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="ConsultaIndicadorSeleccionVivienda">
+        <sql>
+            select sel_viv_proyecto as proyecto, count(*) as total, round(count(*)::numeric/total*100) porcentaje 
+            ,round(count(*)::numeric/(select count(*) suma from seleccion_vivienda )*100,1) porcentaje_total
+            from 
+            seleccion_vivienda
+            ,(select max(total) total from (select count(*) total from seleccion_vivienda group by sel_viv_proyecto   )a ) total 
+            group by sel_viv_proyecto, total order by count(*) desc;
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="estado_novedad">
+        <sql>
+            select identificador, cordis_entrada, cordis_salida , usuario_nombre , tiact_desc
+            from actividad, proceso, tipo_actividad, usuario
+            where proc_id=proceso_id 
+            and tipo_actividad_id=tiact_id
+            and usuario_usuario=actividad_usuario 
+            and tiest_proc_id=2 
+            and actividad_activa=TRUE
+            and identificador like '%@identificador%'
+            order by proc_id
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="modificatorias">
+        <sql>
+            SELECT * FROM tipo_modificatoria 
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="revocatorias">
+        <sql>
+            SELECT * FROM tipo_revocatoria 
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="guardar_revocatoria">
+        <sql>
+            INSERT INTO revocatoria(
+            id_resolucion, id_tipo_revocatoria, fecha_revocatoria,justificacion)
+            VALUES ((select id_resolucion from resolucion where id_resolucion=@resolucion), @tipo, '@fecha','@justificacion')
+            returning *
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="actualizar_revocatoria">
+        <sql>
+            UPDATE revocatoria
+            SET id_tipo_revocatoria=@tipo, fecha_revocatoria='@fecha'
+            WHERE id_resolucion=@resolucion AND id_tipo_revocatoria=@tipo
+            returning *
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="csv_op">
+        <sql>
+          SELECT 
+            r.identificador, d."Cedula 1", d."Nombre 1", c.cdp_numero , r.resolucion, (c.cdp_objeto ||' ID:'|| r.identificador ||', Localidad:'|| d."Localidad" ||', UPZ:'|| d."UPZ" ||', SECTOR:'|| COALESCE( d."Sector",'')) as asunto
+          FROM 
+            public.cdp AS c, 
+            public.resolucion AS r, 
+            public.definitiva AS d
+          WHERE 
+            c.cdp_id = r.cdp_id AND
+            r.identificador = d."IDENTIFICADOR" AND
+            r.identificador in ('@identificadores')
+          AND c.cdp_numero = '@cdp'
+          AND r.resolucion in ('@resoluciones')
+            order by r.resolucion
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="reporte_resumen_contratos_x_mes">
+        <sql>
+            select 
+		  --row_number() over (ORDER BY contrato.identificador, ( cont_fecha_inicio + (interval '1 month' * (b.n -1)))::DATE ) as num,
+		  contrato.identificador "identificador"
+		  ,contrato.consecontrato "contrato"
+		  
+		  ,cont_fecha_inicio "Fecha Inicio"
+		  ,cont_fecha_fin "Fecha Fin"
+		  ,date_trunc('month',cont_fecha_inicio + (interval '1 month' * (b.n -1)) )::date "Mes"
+		  , to_char( cont_fecha_inicio + (interval '1 month' * (b.n -1)), 'TMMonth "de" YYYY') as "MES LETRAS"
+		  ,sel_viv_estado_entrega "Estado Entrega de vivienda"
+		  ,sel_viv_fecha_entrega "Fecha Entrega"
+		from 
+		  contrato
+		  LEFT JOIN definitiva on contrato.identificador = definitiva."IDENTIFICADOR"
+		  LEFT JOIN seleccion_vivienda on contrato.identificador = seleccion_vivienda.identificador
+		  , generate_series(1,
+			ceil(
+			  date_part( 'year', age( date_trunc('year',date_trunc('month',cont_fecha_fin) + (interval '1 month') - (interval '1 day') ), date_trunc('year',date_trunc('month',cont_fecha_inicio)) ) ) * 12 +
+			  date_part( 'month', age( date_trunc('month',date_trunc('month',cont_fecha_fin) + (interval '1 month') - (interval '1 day') ), date_trunc('month',date_trunc('month',cont_fecha_inicio)) ) ) +
+			  date_part( 'day', age( date_trunc('day',date_trunc('month',cont_fecha_fin) + (interval '1 month') - (interval '1 day') ), date_trunc('day',date_trunc('month',cont_fecha_inicio)) ) ) / 30
+			)::integer
+		  ) as b(n)
+		 where 
+		   (case when sel_viv_estado_entrega ilike '%entregado%' then ( cont_fecha_inicio + (interval '1 month' * (b.n -1))) &lt; sel_viv_fecha_entrega  else TRUE end)
+		    and ( cont_fecha_inicio + (interval '1 month' * (b.n -1))) &lt; cont_fecha_fin
+
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    
+    <Consulta id="consultaSuspencionesReloca">
+        <sql>
+            SELECT
+            susp_id ,
+            susp_concepto,
+            susp_detalle,
+            susp_observaciones,
+            susp_cordis_salida,
+            to_char( susp_fecha_cordis_salida, 'DD/MM/YYYY') susp_fecha_cordis_salida,
+            susp_cordis_entrada ,
+            to_char( susp_fecha_cordis_entrada, 'DD/MM/YYYY') susp_fecha_cordis_entrada,
+            susp_estado_ayuda,
+            coalesce( (select usuario_nombre from usuario where usuario_usuario = susp_user),susp_user) susp_user,
+            (select usuario_contrato from usuario where usuario_usuario = susp_user) usuario_cargo,
+            to_char( susp_time, 'DD/MM/YYYY HH12:MI AM') susp_time,
+            identificador
+            FROM suspenciones_relocalizacion 
+            WHERE identificador = '@identificador'
+            ORDER BY susp_time::timestamp desc, susp_id desc
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+    <Consulta id="consultaDatsosOficioSuspencionReloca">
+        <sql>
+            select 
+                identificador,
+                "Nombre 1" as nombre,
+                coalesce(cont_direccion_predio, 'SIN DIRECCIÓN REGISTRADA') cont_direccion_predio,
+                coalesce('Localidad: ' || cont_localidad_predio || ' - ' || (select localidad_desc from localidad where localidad_id = cont_localidad_predio) , '') cont_localidad_predio ,
+                coalesce(cont_barrio_predio , '') cont_barrio_predio,
+                coalesce(beneficiario_telefono, '') beneficiario_telefono
+               from 
+                definitiva
+                JOIN contrato ON "IDENTIFICADOR" = identificador
+               where "IDENTIFICADOR" = '@identificador'
+               and consecontrato = (select max(consecontrato) from contrato where identificador = '@identificador')
+
+        </sql>
+        <conexion>atencion_reloca</conexion>
+        <permisos>*</permisos>
+    </Consulta>
+</Consultas>

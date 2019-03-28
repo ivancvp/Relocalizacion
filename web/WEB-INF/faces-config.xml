@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- =========== FULL CONFIGURATION FILE ================================== -->
+
+<faces-config version="2.1"
+              xmlns="http://java.sun.com/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_1.xsd">
+
+    <!-- Manejadores -->
+    <managed-bean>
+        <managed-bean-name>UsuarioManager</managed-bean-name>
+        <managed-bean-class>com.frmejia.backend.manager.UsuarioManager</managed-bean-class>      
+    
+        <managed-bean-scope>request</managed-bean-scope></managed-bean>
+    
+    <!-- Seguridad -->
+    <lifecycle>
+        <phase-listener>
+            com.frmejia.backend.security.AuthenticationPhaseListener
+        </phase-listener>
+    </lifecycle>
+    
+    <navigation-rule>
+        <navigation-case>
+            <from-outcome>login</from-outcome>
+            <to-view-id>/login.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>create</from-outcome>
+            <to-view-id>/create.jsp</to-view-id>     
+            <redirect/>       
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>app-main</from-outcome>
+            <to-view-id>/index.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>solicitudes</from-outcome>
+            <to-view-id>/solicitudes.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>tecnico</from-outcome>
+            <to-view-id>/tecnico.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>juridico</from-outcome>
+            <to-view-id>/juridico.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>reportes</from-outcome>
+            <to-view-id>/reportes.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>administrar</from-outcome>
+            <to-view-id>/administrar.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>plugins</from-outcome>
+            <to-view-id>/plugins.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>auditoria</from-outcome>
+            <to-view-id>/auditoria.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>resoluciones</from-outcome>
+            <to-view-id>/resoluciones.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>radicacion_memorandos</from-outcome>
+            <to-view-id>/radicacion_memorandos.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>seguimiento_novedades</from-outcome>
+            <to-view-id>/seguimiento_novedades.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>      
+            <from-outcome>crp_op</from-outcome>
+            <to-view-id>/crp_op.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>      
+            <from-outcome>calculo_ayuda</from-outcome>
+            <to-view-id>/calculo_ayuda.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>      
+            <from-outcome>consulta_resolucion</from-outcome>
+            <to-view-id>/consultar_resolucion.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+    
+</faces-config>
